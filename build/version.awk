@@ -27,10 +27,9 @@ function bump (vs, level) {
   if (level == "major") {
     vs = (substr(vs, 0, 1) + 1) ".0.0";
   } else if (level == "minor") {
-    vs = substr(vs, 0, 1) "." (substr(vs, 2, 3) + 1) ".0";
+    vs = substr(vs, 0, 1) "." (substr(vs, 3, 1) + 1) ".0";
   } else if (level == "patch") {
-    vs = substr(vs, 0, 1) "." substr(vs, 2, 3) "." (substr(vs, 4, 5) + 1)
+    vs = substr(vs, 0, 1) "." substr(vs, 3, 1) "." (substr(vs, 5, 1) + 1)
   }
-  gensub(/[0-9]+\.[0-9]+\.[0-9]+/, vs, 1, $1)
   return vs;
 }
