@@ -17,6 +17,8 @@
 
 (defconst homebrew-mode-version "0.1.0")
 
+;; Customization
+
 (defgroup homebrew-mode nil
   "Minor mode for editing Homebrew formulae."
   :group 'ruby)
@@ -44,9 +46,6 @@
     (define-key map homebrew-mode-keymap-prefix homebrew-mode-command-map)
     map)
   "Keymap for `homebrew-mode`.")
-
-;; Make C-c h behave like a prefix
-;; (define-key homebrew-mode-map homebrew-mode-keymap-prefix nil)
 
 (defcustom homebrew-formula-file-patterns
   '( ".*\/homebrew-[^\/]*\/[^\/]*\.rb$"
