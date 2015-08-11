@@ -3,7 +3,8 @@
 emacs ?= $(shell which emacs)
 flags ?= --directory .
 
-LISPS = homebrew-mode.el
+BASE_FILE = homebrew-mode.el
+LISPS = $(BASE_FILE)
 
 default: compile
 
@@ -16,20 +17,20 @@ clean:
 temp ?= $(uuid)
 
 major:
-	HM_VERSION_SHIFT=major build/version.awk homebrew-mode.el > $(uuid).el
-	rm homebrew-mode.el
-	mv $(uuid).el homebrew-mode.el
+	HM_VERSION_SHIFT=major build/version.awk $(BASE_FILE) > $(uuid).el
+	rm $(BASE_FILE)
+	mv $(uuid).el $(BASE_FILE)
 
 minor:
-	HM_VERSION_SHIFT=minor build/version.awk homebrew-mode.el > $(uuid).el
-	rm homebrew-mode.el
-	mv $(uuid).el homebrew-mode.el
+	HM_VERSION_SHIFT=minor build/version.awk $(BASE_FILE) > $(uuid).el
+	rm $(BASE_FILE)
+	mv $(uuid).el $(BASE_FILE)
 
 patch:
-	HM_VERSION_SHIFT=patch build/version.awk homebrew-mode.el > $(uuid).el
-	rm homebrew-mode.el
-	mv $(uuid).el homebrew-mode.el
+	HM_VERSION_SHIFT=patch build/version.awk $(BASE_FILE) > $(uuid).el
+	rm $(BASE_FILE)
+	mv $(uuid).el $(BASE_FILE)
 
-version=$(shell ack -o -m 1 "[0-9]+\.[0-9]+\.[0-9]+" homebrew-mode.el)
+version=$(shell ack -o -m 1 "[0-9]+\.[0-9]+\.[0-9]+" $(BASE_FILE))
 tag:
 	git tag -a $(version) -m "v$(version)"
