@@ -17,26 +17,46 @@
 
 (defconst homebrew-mode-version "0.1.0")
 
-(defun homebrew-autotools ()
-  "For HEAD builds."
-  ;; TODO: search source dir for autogen.sh/bootstrap and check if
-  ;; libtool is required or not.
-  (interactive)
-  (insert "depends_on \"automake\" => :build\n"
-    "    depends_on \"autoconf\" => :build\n"
-    "    depends_on \"libtool\" => :build"))
+(defgroup homebrew-mode nil
+  "Minor mode for editing Homebrew formulae."
+  :group 'ruby)
 
-;;;###autoload
-(defun homebrew-mode-start ()
-  "Activate homebrew-mode."
-  (interactive)
-  (homebrew-mode 1))
+;; Most of the keymap stuff discovered through studying flycheck.el,
+;; so ty lunaryorn."
+(defcustom homebrew-mode-keymap-prefix (kbd "C-c h")
+  "Prefix for homebrew-mode key bindings."
+  :group 'homebrew-mode
+  :type 'string
+  :risky t)
 
-;; TODO: make defcustom
-(defconst homebrew-formula-file-patterns
+(defcustom homebrew-mode-command-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map "a"         #'homebrew-autotools)
+    map)
+  "Keymap for `homebrew-mode` commands prefixed by homebrew-mode-keymap-prefix."
+  :group 'homebrew-mode
+  :type 'string
+  :risky t)
+
+(defvar homebrew-mode-map
+  ;; define-key doesn't return the map, so we need a `let`
+  (let ((map (make-sparse-keymap)))
+    (define-key map homebrew-mode-keymap-prefix homebrew-mode-command-map)
+    map)
+  "Keymap for `homebrew-mode`.")
+
+;; Make C-c h behave like a prefix
+;; (define-key homebrew-mode-map homebrew-mode-keymap-prefix nil)
+
+(defcustom homebrew-formula-file-patterns
   '( ".*\/homebrew-[^\/]*\/[^\/]*\.rb$"
      ".*\/Formula\/[^\/]*\.rb$"
-     ".*\/HomebrewFormula\/[^\/]*\.rb$" ))
+     ".*\/HomebrewFormula\/[^\/]*\.rb$" )
+  "Regular expressions matching Homebrew formulae files.
+
+If you edit this variable, make sure the new value passes the formula-detection tests."
+  :group 'homebrew-mode
+  :risky t)
 
 (defun homebrew--formula-file-p (buffer-or-string)
   "Return true if BUFFER-OR-STRING is:
@@ -56,6 +76,22 @@ Otherwise return nil."
         (if (string-match elem buffer-or-string)
           (setq match t))))))
 
+
+(defun homebrew-autotools ()
+  "For HEAD builds."
+  ;; TODO: search source dir for autogen.sh/bootstrap and check if
+  ;; libtool is required or not.
+  (interactive)
+  (insert "depends_on \"automake\" => :build\n"
+    "    depends_on \"autoconf\" => :build\n"
+    "    depends_on \"libtool\" => :build"))
+
+;;;###autoload
+(defun homebrew-mode-start ()
+  "Activate homebrew-mode."
+  (interactive)
+  (homebrew-mode 1))
+
 ;;;###autoload
 (defun homebrew-mode-default-hooks ()
   "Register hooks for homebrew-mode."
@@ -67,7 +103,8 @@ Otherwise return nil."
 ;;;###autoload
 (define-minor-mode homebrew-mode
   "Helper functions for editing Homebrew formulae"
-  :lighter "Brew")
+  :lighter "Brew"
+  :keymap homebrew-mode-map)
 
 (provide 'homebrew-mode)
 
