@@ -11,4 +11,4 @@ compile: $(LISPS)
 	$(emacs) --batch -Q $(flags) -f batch-byte-compile $<
 
 clean:
-	rm *.elc
+	rm *.elc *~
