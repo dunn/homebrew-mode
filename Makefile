@@ -29,3 +29,7 @@ patch:
 	HM_VERSION_SHIFT=patch build/version.awk homebrew-mode.el > $(uuid).el
 	rm homebrew-mode.el
 	mv $(uuid).el homebrew-mode.el
+
+version=$(shell ack -o -m 1 "[0-9]+\.[0-9]+\.[0-9]+" homebrew-mode.el)
+tag:
+	git tag -a $(version) -m "v$(version)"
