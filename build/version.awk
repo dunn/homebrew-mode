@@ -2,10 +2,12 @@
 
 BEGIN {
   FS="\n"
-  VERSION_STRING=FILENAME"-version";
   level = ENVIRON["HM_VERSION_SHIFT"]
 }
 {
+  PKG_NAME=gensub("\\.el", "", "g", FILENAME)
+  VERSION_STRING=PKG_NAME"-version";
+
   package_version = match($1, "^;; Version: [0-9]");
   if (package_version) {
     version = substr($1, 13);
@@ -15,7 +17,7 @@ BEGIN {
     # section once
     package_version=0
   } else if ($1 != "" && $1 == const_string) {
-    print "(defconst "VERSION_STRING" \""bump(version,level)"\")"
+    print "(defconst "VERSION_STRING" \""bump(version, level)"\")"
   } else {
     print $1;
   }
