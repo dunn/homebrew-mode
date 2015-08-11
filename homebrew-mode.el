@@ -75,7 +75,6 @@ Otherwise return nil."
         (if (string-match elem buffer-or-string)
           (setq match t))))))
 
-
 (defun homebrew-autotools ()
   "For HEAD builds."
   ;; TODO: search source dir for autogen.sh/bootstrap and check if
