@@ -90,12 +90,6 @@ Otherwise return nil."
       "    depends_on \"libtool\" => :build")))
 
 ;;;###autoload
-(defun homebrew-mode-start ()
-  "Activate homebrew-mode."
-  (interactive)
-  (homebrew-mode 1))
-
-;;;###autoload
 (defun homebrew-mode-default-hooks ()
   "Register hooks for starting homebrew-mode."
   (add-hook 'find-file-hook
