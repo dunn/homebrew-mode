@@ -55,6 +55,7 @@
 
 If you edit this variable, make sure the new value passes the formula-detection tests."
   :group 'homebrew-mode
+  :type 'list
   :risky t)
 
 (defun homebrew--formula-file-p (buffer-or-string)
@@ -96,7 +97,7 @@ Otherwise return nil."
 
 ;;;###autoload
 (defun homebrew-mode-default-hooks ()
-  "Register hooks for homebrew-mode."
+  "Register hooks for starting homebrew-mode."
   (add-hook 'find-file-hook
     (lambda ()
       (if (homebrew--formula-file-p (current-buffer))
