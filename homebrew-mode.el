@@ -80,9 +80,13 @@ Otherwise return nil."
   ;; TODO: search source dir for autogen.sh/bootstrap and check if
   ;; libtool is required or not.
   (interactive)
-  (insert "depends_on \"automake\" => :build\n"
-    "    depends_on \"autoconf\" => :build\n"
-    "    depends_on \"libtool\" => :build"))
+  (let ( (indentation (- 4 (current-column)))
+         (padding "") )
+    (dotimes (_ indentation) (setq padding (concat padding " ")))
+    (insert
+      padding "depends_on \"automake\" => :build\n"
+      "    depends_on \"autoconf\" => :build\n"
+      "    depends_on \"libtool\" => :build")))
 
 ;;;###autoload
 (defun homebrew-mode-start ()
