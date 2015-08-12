@@ -24,19 +24,19 @@ clean:
 temp ?= $(uuid)
 
 major:
-	HM_VERSION_SHIFT=major build/version.awk $(BASE_FILE) > $(uuid).el
+	HM_VERSION_SHIFT=major build/version.awk $(BASE_FILE) > $(temp).el
 	rm $(BASE_FILE)
-	mv $(uuid).el $(BASE_FILE)
+	mv $(temp).el $(BASE_FILE)
 
 minor:
-	HM_VERSION_SHIFT=minor build/version.awk $(BASE_FILE) > $(uuid).el
+	HM_VERSION_SHIFT=minor build/version.awk $(BASE_FILE) > $(temp).el
 	rm $(BASE_FILE)
-	mv $(uuid).el $(BASE_FILE)
+	mv $(temp).el $(BASE_FILE)
 
 patch:
-	HM_VERSION_SHIFT=patch build/version.awk $(BASE_FILE) > $(uuid).el
+	HM_VERSION_SHIFT=patch build/version.awk $(BASE_FILE) > $(temp).el
 	rm $(BASE_FILE)
-	mv $(uuid).el $(BASE_FILE)
+	mv $(temp).el $(BASE_FILE)
 
 version=$(shell ack -o -m 1 "[0-9]+\.[0-9]+\.[0-9]+" $(BASE_FILE))
 tag:
