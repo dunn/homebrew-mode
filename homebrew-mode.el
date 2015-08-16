@@ -5,7 +5,7 @@
 ;; Author: Alex Dunn <dunn.alex@gmail.com>
 ;; URL:
 ;; Version: 0.1.0
-;; Package-Requires: ((async "1.4"))
+;; Package-Requires: ()
 ;; Keywords: homebrew brew ruby
 ;; Prefix: homebrew
 
@@ -15,7 +15,7 @@
 
 ;;; Requires:
 
-(require 'async)
+(require 'dired)
 
 ;;; Code:
 
@@ -37,7 +37,10 @@
 
 (defcustom homebrew-mode-command-map
   (let ((map (make-sparse-keymap)))
-    (define-key map "a"         #'homebrew-autotools)
+    (define-key map "a"     #'homebrew-autotools)
+    (define-key map "c"     #'homebrew-pop-to-cache)
+    (define-key map "f"     #'homebrew-fetch)
+    (define-key map "u"     #'homebrew-unpack)
     map)
   "Keymap for `homebrew-mode` commands prefixed by homebrew-mode-keymap-prefix."
   :group 'homebrew-mode
@@ -56,6 +59,11 @@
   :group 'homebrew-mode
   :type 'string)
 
+(defcustom homebrew-cache-dir "/Library/Caches/Homebrew"
+  "The cache directory for Homebrew."
+  :group 'homebrew-mode
+  :type 'string)
+
 (defcustom homebrew-formula-file-patterns
   '( ".*\/homebrew-[^\/]*\/[^\/]*\.rb$"
      ".*\/Formula\/[^\/]*\.rb$"
@@ -66,6 +74,51 @@ If you edit this variable, make sure the new value passes the formula-detection 
   :group 'homebrew-mode
   :type 'list
   :risky t)
+
+;; Extracted from async.el
+(defun homebrew--async-simple-alert (process &rest change)
+  "Simply displays a notification in the echo area when PROCESS ends.
+Ignore the CHANGE of state argument passed by `set-process-sentinel'."
+  (when (eq 'exit (process-status process))
+    (let ( (exit-code (process-exit-status process))
+           (proc-name (process-name process)))
+      (if (= 0 exit-code)
+        (message "%s completed" proc-name)
+        (message "%s failed with %d" proc-name exit-code)))))
+
+(defun homebrew--async-unpack-and-jump (process &rest change)
+  "Called when the `homebrew-unpack' PROCESS completes.
+Unpack and enter the source dir.
+Ignore the CHANGE of state argument passed by `set-process-sentinel'."
+  (when (eq 'exit (process-status process))
+    (let* ( (exit-code (process-exit-status process))
+            (proc-name (process-name process))
+            ;; is there no replace-in-string?
+            (unpack-cmd (replace-regexp-in-string "fetch" "unpack" proc-name)))
+      (if (= 0 exit-code)
+        ;; * Temporarily set default-directory to the Homebrew cache,
+        ;;   so we unpack in the right place.
+        ;;
+        ;; * Extract the formula name from the name of PROCESS.
+        ;;
+        ;; * We do the actual unpacking in the let* block, and
+        ;;   'result' is the output of `brew unpack`.
+        (let* ( (default-directory homebrew-cache-dir)
+                (formula (replace-regexp-in-string ".*\\ " "" proc-name))
+                (result (shell-command-to-string unpack-cmd))
+                ;; * dest-dir is the location of the unpacked source.
+                ;;
+                ;; TODO: use only one replace-regexp-in-string when
+                ;; parsing the output of `brew unpack`
+                ;;
+                ;; right now the nested replace goes first, removing
+                ;; everything but the first line, then the outer replace
+                ;; removes everything on the first line but the directory name
+                (dest-dir (replace-regexp-in-string "==> Unpacking.*to: " ""
+                            (replace-regexp-in-string "\n.*" "" result))))
+          (message (concat formula " unpacked to " dest-dir))
+          (dired-jump t dest-dir))
+        (message "%s failed with %d" proc-name exit-code)))))
 
 (defun homebrew--formula-file-p (buffer-or-string)
   "Return true if BUFFER-OR-STRING is:
@@ -97,23 +150,9 @@ Return nil if there definitely isn't one."
         (setq f (replace-regexp-in-string "\.rb" "" f))))
     f))
 
-(defun homebrew-fetch (formula build)
-  "Download FORMULA to the Homebrew cache.
-BUILD may be stable, devel or head."
-  (interactive (list (homebrew--formula-from-file buffer-file-name)
-                 (read-string "Build type (default stable) " nil nil "stable")))
-  (message "Downloading %s source of %s ..." build formula)
-  (async-start-process
-    ;; Process name
-    (concat "brew fetch --" build " " formula)
-    homebrew-brew-executable
-    (lambda (result) (message "`%s` complete" result))
-    "fetch" "-fs" (concat "--" build) formula))
-
 (defun homebrew-autotools ()
-  "For HEAD builds."
-  ;; TODO: search source dir for autogen.sh/bootstrap and check if
-  ;; libtool is required or not.
+  "Insert autotool deps for HEAD builds."
+  ;; TODO: check if libtool is required or not.
   (interactive)
   (let ( (indentation (- 4 (current-column)))
          (padding "") )
@@ -122,6 +161,42 @@ BUILD may be stable, devel or head."
       padding "depends_on \"automake\" => :build\n"
       "    depends_on \"autoconf\" => :build\n"
       "    depends_on \"libtool\" => :build")))
+
+(defun homebrew--fetch (formula build)
+  "Download FORMULA to the Homebrew cache.
+BUILD may be stable, devel or head.  Return the process."
+  (start-process
+    ;; Process name
+    (concat "brew fetch --" build " " formula)
+    ;; Buffer name
+    "*Homebrew*"
+    homebrew-brew-executable
+    "fetch" "-fs" (concat "--" build) formula))
+
+(defun homebrew-fetch (formula build)
+  "Download FORMULA to the Homebrew cache, and alert when done.
+BUILD may be stable, devel or head."
+  (interactive (list (homebrew--formula-from-file buffer-file-name)
+                 (read-string "Build type (default stable) " nil nil "stable")))
+  (if (not (equal build (or "stable" "devel" "HEAD")))
+    (error "Allowed build types are \"stable\", \"devel\", and \"HEAD\"")    )
+  (message "Downloading %s source of %s ..." build formula)
+  (set-process-sentinel (homebrew--fetch formula build) 'homebrew--async-simple-alert))
+
+(defun homebrew-pop-to-cache ()
+  "Open the Homebrew cache in a new window."
+  (interactive)
+  (dired-jump t homebrew-cache-dir))
+
+(defun homebrew-unpack (formula build)
+  "Download FORMULA to the Homebrew cache, then unpack and open in a new window.
+BUILD may be stable, devel or head."
+  (interactive (list (homebrew--formula-from-file buffer-file-name)
+                 (read-string "Build type (default stable) " nil nil "stable")))
+  (if (not (equal build (or "stable" "devel" "HEAD")))
+    (error "Allowed build types are \"stable\", \"devel\", and \"HEAD\"")    )
+  (message "Unpacking %s source of %s ..." build formula)
+  (set-process-sentinel (homebrew--fetch formula build) 'homebrew--async-unpack-and-jump))
 
 ;;;###autoload
 (defun homebrew-mode-default-hooks ()
