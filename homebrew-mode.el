@@ -5,13 +5,17 @@
 ;; Author: Alex Dunn <dunn.alex@gmail.com>
 ;; URL:
 ;; Version: 0.1.0
-;; Package-Requires: ()
+;; Package-Requires: ((async "1.4"))
 ;; Keywords: homebrew brew ruby
 ;; Prefix: homebrew
 
 ;;; Commentary:
 
 ;; minor mode for editing Homebrew formula!
+
+;;; Requires:
+
+(require 'async)
 
 ;;; Code:
 
@@ -46,6 +50,11 @@
     (define-key map homebrew-mode-keymap-prefix homebrew-mode-command-map)
     map)
   "Keymap for `homebrew-mode`.")
+
+(defcustom homebrew-brew-executable "/usr/local/bin/brew"
+  "The location of the `brew` executable."
+  :group 'homebrew-mode
+  :type 'string)
 
 (defcustom homebrew-formula-file-patterns
   '( ".*\/homebrew-[^\/]*\/[^\/]*\.rb$"
@@ -87,6 +96,19 @@ Return nil if there definitely isn't one."
         (setq f (replace-regexp-in-string ".*\/" "" string))
         (setq f (replace-regexp-in-string "\.rb" "" f))))
     f))
+
+(defun homebrew-fetch (formula build)
+  "Download FORMULA to the Homebrew cache.
+BUILD may be stable, devel or head."
+  (interactive (list (homebrew--formula-from-file buffer-file-name)
+                 (read-string "Build type (default stable) " nil nil "stable")))
+  (message "Downloading %s source of %s ..." build formula)
+  (async-start-process
+    ;; Process name
+    (concat "brew fetch --" build " " formula)
+    homebrew-brew-executable
+    (lambda (result) (message "`%s` complete" result))
+    "fetch" "-fs" (concat "--" build) formula))
 
 (defun homebrew-autotools ()
   "For HEAD builds."
