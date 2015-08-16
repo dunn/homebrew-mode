@@ -59,7 +59,7 @@
   :group 'homebrew-mode
   :type 'string)
 
-(defcustom homebrew-cache-dir "/Library/Caches/Homebrew"
+(defcustom homebrew-cache-dir "/Library/Caches/Homebrew/"
   "The cache directory for Homebrew."
   :group 'homebrew-mode
   :type 'string)
@@ -116,8 +116,9 @@ Ignore the CHANGE of state argument passed by `set-process-sentinel'."
                 ;; removes everything on the first line but the directory name
                 (dest-dir (replace-regexp-in-string "==> Unpacking.*to: " ""
                             (replace-regexp-in-string "\n.*" "" result))))
-          (message (concat formula " unpacked to " dest-dir))
-          (dired-jump t dest-dir))
+          ;; Add a slash to the end so dired enters the directory
+          ;; instead of starting with it under point:
+          (dired-jump t (concat dest-dir "/")))
         (message "%s failed with %d" proc-name exit-code)))))
 
 (defun homebrew--formula-file-p (buffer-or-string)
