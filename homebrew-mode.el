@@ -76,6 +76,18 @@ Otherwise return nil."
         (if (string-match elem buffer-or-string)
           (setq match t))))))
 
+(defun homebrew--formula-from-file (string)
+  "Return the name of the formula located at the path specified by STRING.
+Return nil if there definitely isn't one."
+  (let ((f (and (homebrew--formula-file-p string) (file-exists-p string))))
+    ;; f will be nil if STRING isn't a valid pathname
+    (if f
+      ;; TODO: do in one
+      (progn
+        (setq f (replace-regexp-in-string ".*\/" "" string))
+        (setq f (replace-regexp-in-string "\.rb" "" f))))
+    f))
+
 (defun homebrew-autotools ()
   "For HEAD builds."
   ;; TODO: search source dir for autogen.sh/bootstrap and check if
