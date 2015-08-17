@@ -76,6 +76,11 @@ If you edit this variable, make sure the new value passes the formula-detection 
   :type 'list
   :risky t)
 
+(defcustom homebrew-patch-whitespace-mode nil
+  "Turn on `whitespace-mode' when editing formulae with inline patches."
+  :group 'homebrew-mode
+  :type 'boolean)
+
 ;; Extracted from async.el
 (defun homebrew--async-simple-alert (process &rest change)
   "Simply displays a notification in the echo area when PROCESS ends.
@@ -217,7 +222,11 @@ BUILD may be stable, devel or head."
              (0 diff-header-face)
              (2 (if (not (match-end 3)) diff-file-header-face) prepend))
            ("^\\([-<]\\)\\(.*\n\\)" (1 diff-indicator-removed-face) (2 diff-removed-face))
-           ("^\\([+>]\\)\\(.*\n\\)" (1 diff-indicator-added-face) (2 diff-added-face)))))))
+           ("^\\([+>]\\)\\(.*\n\\)" (1 diff-indicator-added-face) (2 diff-added-face))))))
+  (add-hook 'homebrew-mode-hook
+    (lambda ()
+      (if (and homebrew-patch-whitespace-mode (string-match "__END__" (buffer-string)))
+        (whitespace-mode)))))
 
 ;;;###autoload
 (define-minor-mode homebrew-mode
