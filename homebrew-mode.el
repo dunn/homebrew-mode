@@ -172,6 +172,17 @@ Ignore the CHANGE of state argument passed by `set-process-sentinel'."
           (dired-jump t (concat dest-dir "/")))
         (message "%s failed with %d" proc-name exit-code)))))
 
+(defun homebrew--fetch (formula build)
+  "Download FORMULA to the Homebrew cache.
+BUILD may be stable, devel or head.  Return the process."
+  (start-process
+    ;; Process name
+    (concat "brew fetch --" build " " formula)
+    ;; Buffer name
+    "*Homebrew*"
+    homebrew-executable
+    "fetch" "-fs" (concat "--" build) formula))
+
 (defun homebrew--formula-file-p (buffer-or-string)
   "Return true if BUFFER-OR-STRING is:
 
@@ -213,17 +224,6 @@ Return nil if there definitely isn't one."
       padding "depends_on \"automake\" => :build\n"
       "    depends_on \"autoconf\" => :build\n"
       "    depends_on \"libtool\" => :build")))
-
-(defun homebrew--fetch (formula build)
-  "Download FORMULA to the Homebrew cache.
-BUILD may be stable, devel or head.  Return the process."
-  (start-process
-    ;; Process name
-    (concat "brew fetch --" build " " formula)
-    ;; Buffer name
-    "*Homebrew*"
-    homebrew-executable
-    "fetch" "-fs" (concat "--" build) formula))
 
 (defun homebrew-fetch (formula build)
   "Download FORMULA to the Homebrew cache, and alert when done.
