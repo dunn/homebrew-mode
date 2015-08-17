@@ -240,7 +240,6 @@ BUILD may be stable, devel or head."
   (interactive "MBuild stanzas for: ")
   (unless homebrew-poet-executable
     (error "Cannot find `poet` executable; set `homebrew-poet-executable'"))
-  (print packages)
   (dolist (package (split-string packages))
     (insert (shell-command-to-string
               (concat homebrew-poet-executable " " package " 2>/dev/null")))
