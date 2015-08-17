@@ -80,6 +80,7 @@
     (define-key map "a"     #'homebrew-autotools)
     (define-key map "c"     #'homebrew-pop-to-cache)
     (define-key map "f"     #'homebrew-fetch)
+    (define-key map "p"     #'homebrew-poet-insert)
     (define-key map "u"     #'homebrew-unpack)
     map)
   "Keymap for `homebrew-mode` commands prefixed by homebrew-mode-keymap-prefix."
@@ -119,6 +120,11 @@ If you edit this variable, make sure the new value passes the formula-detection 
   "Turn on `whitespace-mode' when editing formulae with inline patches."
   :group 'homebrew-mode
   :type 'boolean)
+
+(defcustom homebrew-poet-executable nil
+  "Path to `poet` executable.  Install with `pip install homebrew-pypi-poet`."
+  :group 'homebrew-mode
+  :type 'string)
 
 ;; Extracted from async.el
 (defun homebrew--async-simple-alert (process &rest change)
@@ -228,6 +234,17 @@ BUILD may be stable, devel or head."
     (error "Allowed build types are \"stable\", \"devel\", and \"HEAD\"")    )
   (message "Downloading %s source of %s ..." build formula)
   (set-process-sentinel (homebrew--fetch formula build) 'homebrew--async-simple-alert))
+
+(defun homebrew-poet-insert (packages)
+  "Insert resource blocks for the specified Python PACKAGES."
+  (interactive "MBuild stanzas for: ")
+  (unless homebrew-poet-executable
+    (error "Cannot find `poet` executable; set `homebrew-poet-executable'"))
+  (print packages)
+  (dolist (package (split-string packages))
+    (insert (shell-command-to-string
+              (concat homebrew-poet-executable " " package " 2>/dev/null")))
+    (insert "\n")))
 
 (defun homebrew-pop-to-cache ()
   "Open the Homebrew cache in a new window."
