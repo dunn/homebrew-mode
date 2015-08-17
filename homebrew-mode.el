@@ -261,6 +261,8 @@ BUILD may be stable, devel or head."
   (message "Unpacking %s source of %s ..." build formula)
   (set-process-sentinel (homebrew--fetch formula build) 'homebrew--async-unpack-and-jump))
 
+;;; Setup
+
 (defun homebrew-mode-default-hooks ()
   "Register hooks for starting homebrew-mode."
   (add-hook 'find-file-hook
