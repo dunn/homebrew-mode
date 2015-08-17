@@ -16,6 +16,7 @@
 ;;; Requires:
 
 (require 'dired)
+(require 'diff-mode)
 
 ;;; Code:
 
@@ -205,7 +206,18 @@ BUILD may be stable, devel or head."
   (add-hook 'find-file-hook
     (lambda ()
       (if (homebrew--formula-file-p (current-buffer))
-        (homebrew-mode 1)))))
+        (homebrew-mode 1))))
+  (add-hook 'homebrew-mode-hook
+    (lambda ()
+      (font-lock-add-keywords nil
+        ;; ganked from `diff-font-lock-keywords'; why it can't be simpler idk
+        '( ("\\(^@@ -\\([0-9]+\\)\\(?:,\\([0-9]+\\)\\)? \\+\\([0-9]+\\)\\(?:,\\([0-9]+\\)\\)? @@\\)\\(.*\\)$"
+             (1 diff-hunk-header-face) (6 diff-function-face))
+           ("^\\(---\\|\\+\\+\\+\\|\\*\\*\\*\\) \\([^\t\n]+?\\)\\(?:\t.*\\| \\(\\*\\*\\*\\*\\|----\\)\\)?\n"
+             (0 diff-header-face)
+             (2 (if (not (match-end 3)) diff-file-header-face) prepend))
+           ("^\\([-<]\\)\\(.*\n\\)" (1 diff-indicator-removed-face) (2 diff-removed-face))
+           ("^\\([+>]\\)\\(.*\n\\)" (1 diff-indicator-added-face) (2 diff-added-face)))))))
 
 ;;;###autoload
 (define-minor-mode homebrew-mode
