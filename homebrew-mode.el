@@ -68,7 +68,7 @@
   :group 'ruby)
 
 ;; Most of the keymap stuff discovered through studying flycheck.el,
-;; so ty lunaryorn."
+;; so ty lunaryorn.
 (defcustom homebrew-mode-keymap-prefix (kbd "C-c h")
   "Prefix for homebrew-mode key bindings."
   :group 'homebrew-mode
