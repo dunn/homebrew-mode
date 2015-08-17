@@ -54,7 +54,7 @@
     map)
   "Keymap for `homebrew-mode`.")
 
-(defcustom homebrew-brew-executable "/usr/local/bin/brew"
+(defcustom homebrew-executable "/usr/local/bin/brew"
   "The location of the `brew` executable."
   :group 'homebrew-mode
   :type 'string)
@@ -171,7 +171,7 @@ BUILD may be stable, devel or head.  Return the process."
     (concat "brew fetch --" build " " formula)
     ;; Buffer name
     "*Homebrew*"
-    homebrew-brew-executable
+    homebrew-executable
     "fetch" "-fs" (concat "--" build) formula))
 
 (defun homebrew-fetch (formula build)
