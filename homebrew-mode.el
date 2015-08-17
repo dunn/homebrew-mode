@@ -11,7 +11,7 @@
 
 ;;; Commentary:
 
-;; minor mode for editing Homebrew formula!
+;; It's a minor mode for editing Homebrew formulae!
 
 ;;; Requires:
 
@@ -205,13 +205,12 @@ BUILD may be stable, devel or head."
   (message "Unpacking %s source of %s ..." build formula)
   (set-process-sentinel (homebrew--fetch formula build) 'homebrew--async-unpack-and-jump))
 
-;;;###autoload
 (defun homebrew-mode-default-hooks ()
   "Register hooks for starting homebrew-mode."
   (add-hook 'find-file-hook
     (lambda ()
       (if (homebrew--formula-file-p (current-buffer))
-        (homebrew-mode 1))))
+        (homebrew-mode))))
   (add-hook 'homebrew-mode-hook
     (lambda ()
       (font-lock-add-keywords nil
