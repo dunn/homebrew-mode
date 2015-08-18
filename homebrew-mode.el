@@ -101,7 +101,7 @@
   "Keymap for `homebrew-mode`.")
 
 (defcustom homebrew-executable "/usr/local/bin/brew"
-  "The location of the `brew` executable."
+  "The location of the `brew` executable.  May be different on your system."
   :group 'homebrew-mode
   :type 'string)
 
