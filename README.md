@@ -33,7 +33,7 @@ Currently there are just a few commands:
 ## custom variables
 
 - If you’re using Linuxbrew or a non-standard prefix on Mac OS, you’ll
-  need to update `homebrew-executable` to point at your `brew`.
+  need to update `homebrew-prefix` to point at your `brew –-prefix`.
 
 - If you’re using Linuxbrew or have your cache in a non-standard
   location on Mac OS, update `homebrew-cache-dir`.

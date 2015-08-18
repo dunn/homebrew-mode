@@ -46,7 +46,7 @@
 ;; ## custom variables
 
 ;; - If you’re using Linuxbrew or a non-standard prefix on Mac OS, you’ll
-;;   need to update `homebrew-executable` to point at your `brew`.
+;;   need to update `homebrew-prefix` to point at your `brew –-prefix`.
 
 ;; - If you’re using Linuxbrew or have your cache in a non-standard
 ;;   location on Mac OS, update `homebrew-cache-dir`.
@@ -100,10 +100,12 @@
     map)
   "Keymap for `homebrew-mode`.")
 
-(defcustom homebrew-executable "/usr/local/bin/brew"
-  "The location of the `brew` executable.  May be different on your system."
+(defcustom homebrew-prefix "/usr/local"
+  "The base of your Homebrew installation.  May be different on your system."
   :group 'homebrew-mode
   :type 'string)
+
+(defvar homebrew-executable (concat homebrew-prefix "/bin/brew"))
 
 (defcustom homebrew-cache-dir "/Library/Caches/Homebrew/"
   "The cache directory for Homebrew."
