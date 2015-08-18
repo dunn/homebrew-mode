@@ -133,16 +133,21 @@ If you edit this variable, make sure the new value passes the formula-detection 
   :group 'homebrew-mode
   :type 'string)
 
+;;; Internal functions
+
 ;; Extracted from async.el
-(defun homebrew--async-simple-alert (process &rest change)
-  "Simply displays a notification in the echo area when PROCESS ends.
+(defun homebrew--async-alert (process &rest change)
+  "Simply displays a notification in the echo area when PROCESS succeeds.
+Pop to the process buffer when it fails.
 Ignore the CHANGE of state argument passed by `set-process-sentinel'."
   (when (eq 'exit (process-status process))
     (let ( (exit-code (process-exit-status process))
            (proc-name (process-name process)))
       (if (= 0 exit-code)
         (message "%s completed" proc-name)
-        (message "%s failed with %d" proc-name exit-code)))))
+        (progn
+          (message "%s failed with %d" proc-name exit-code)
+          (pop-to-buffer (concat "*Homebrew: " proc-name "*")))))))
 
 (defun homebrew--async-unpack-and-jump (process &rest change)
   "Called when the `homebrew-unpack' PROCESS completes.
@@ -250,7 +255,7 @@ BUILD may be stable, devel or head."
   (message "Downloading %s source of %s ..." build formula)
   (set-process-sentinel
     (homebrew--start-process "fetch" formula (concat "--" build))
-    'homebrew--async-simple-alert))
+    'homebrew--async-alert))
 
 (defun homebrew-install (formula build)
   "Start `brew install FORMULA` (of the specified BUILD) \
@@ -261,7 +266,7 @@ in a separate buffer and open a window to that buffer."
     (error "Allowed build types are \"stable\", \"devel\", and \"HEAD\"")    )
   (set-process-sentinel
     (homebrew--start-process "install" formula (concat "--" build))
-    'homebrew--async-simple-alert)
+    'homebrew--async-alert)
   (pop-to-buffer (concat "*Homebrew: brew install -v -fs --" build " " formula "*")))
 
 (defun homebrew-poet-insert (packages)
@@ -285,7 +290,7 @@ in a separate buffer and open a window to that buffer."
   (message "Uninstalling %s ..." formula)
   (set-process-sentinel
     (homebrew--start-process "uninstall" formula)
-    'homebrew--async-simple-alert))
+    'homebrew--async-alert))
 
 (defun homebrew-unpack (formula build)
   "Download FORMULA to the Homebrew cache, then unpack and open in a new window.
