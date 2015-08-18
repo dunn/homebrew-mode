@@ -83,7 +83,9 @@
     (define-key map "a"     #'homebrew-autotools)
     (define-key map "c"     #'homebrew-pop-to-cache)
     (define-key map "f"     #'homebrew-fetch)
+    (define-key map "i"     #'homebrew-install)
     (define-key map "p"     #'homebrew-poet-insert)
+    (define-key map "r"     #'homebrew-uninstall)
     (define-key map "u"     #'homebrew-unpack)
     map)
   "Keymap for `homebrew-mode` commands prefixed by homebrew-mode-keymap-prefix."
@@ -182,9 +184,29 @@ BUILD may be stable, devel or head.  Return the process."
     ;; Process name
     (concat "brew fetch --" build " " formula)
     ;; Buffer name
-    "*Homebrew*"
+    (concat "*Homebrew: fetch " formula "*")
     homebrew-executable
     "fetch" "-fs" (concat "--" build) formula))
+
+(defun homebrew--install (formula build)
+  "Install FORMULA.  BUILD may be stable, devel or head.  Return the process."
+  (start-process
+    ;; Process name
+    (concat "brew install --" build " " formula)
+    ;; Buffer name
+    (concat "*Homebrew: install " formula "*")
+    homebrew-executable
+    "install" "-v" "-fs" (concat "--" build) formula))
+
+(defun homebrew--uninstall (formula)
+  "Uninstall FORMULA.  Return the process."
+  (start-process
+    ;; Process name
+    (concat "brew uninstall " formula)
+    ;; Buffer name
+    (concat "*Homebrew: uninstall " formula "*")
+    homebrew-executable
+    "uninstall" "-v " formula))
 
 (defun homebrew--formula-file-p (buffer-or-string)
   "Return true if BUFFER-OR-STRING is:
@@ -238,6 +260,19 @@ BUILD may be stable, devel or head."
   (message "Downloading %s source of %s ..." build formula)
   (set-process-sentinel (homebrew--fetch formula build) 'homebrew--async-simple-alert))
 
+(defun homebrew-install (formula build)
+  "Start `brew install FORMULA` (of the specified BUILD) \
+in a separate buffer and open a window to that buffer."
+  (interactive (list (homebrew--formula-from-file buffer-file-name)
+                 (read-string "Build type (default stable) " nil nil "stable")))
+  (if (not (equal build (or "stable" "devel" "HEAD")))
+    (error "Allowed build types are \"stable\", \"devel\", and \"HEAD\"")    )
+  (set-process-sentinel (homebrew--install formula build) 'homebrew--async-simple-alert)
+  (if (= 1 (length (window-list)))
+      (select-window (split-window-sensibly))
+    (other-window 1))
+  (switch-to-buffer (concat "*Homebrew: install " formula "*")))
+
 (defun homebrew-poet-insert (packages)
   "Insert resource blocks for the specified Python PACKAGES."
   (interactive "MBuild stanzas for: ")
@@ -252,6 +287,12 @@ BUILD may be stable, devel or head."
   "Open the Homebrew cache in a new window."
   (interactive)
   (dired-jump t homebrew-cache-dir))
+
+(defun homebrew-uninstall (formula)
+  "Uninstall FORMULA , and alert when done."
+  (interactive (list (homebrew--formula-from-file buffer-file-name)))
+  (message "Uninstalling %s ..." formula)
+  (set-process-sentinel (homebrew--uninstall formula) 'homebrew--async-simple-alert))
 
 (defun homebrew-unpack (formula build)
   "Download FORMULA to the Homebrew cache, then unpack and open in a new window.
