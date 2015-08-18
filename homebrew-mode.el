@@ -260,10 +260,7 @@ in a separate buffer and open a window to that buffer."
   (set-process-sentinel
     (homebrew--start-process "install" formula (concat "--" build))
     'homebrew--async-simple-alert)
-  (if (= 1 (length (window-list)))
-      (select-window (split-window-sensibly))
-    (other-window 1))
-  (switch-to-buffer (concat "*Homebrew: brew install -v -fs --" build " " formula "*")))
+  (pop-to-buffer (concat "*Homebrew: brew install -v -fs --" build " " formula "*")))
 
 (defun homebrew-poet-insert (packages)
   "Insert resource blocks for the specified Python PACKAGES."
