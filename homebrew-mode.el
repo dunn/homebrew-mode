@@ -206,7 +206,7 @@ BUILD may be stable, devel or head.  Return the process."
     ;; Buffer name
     (concat "*Homebrew: uninstall " formula "*")
     homebrew-executable
-    "uninstall" "-v " formula))
+    "uninstall" "-v" formula))
 
 (defun homebrew--formula-file-p (buffer-or-string)
   "Return true if BUFFER-OR-STRING is:
