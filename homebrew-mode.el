@@ -4,7 +4,7 @@
 
 ;; Author: Alex Dunn <dunn.alex@gmail.com>
 ;; URL:
-;; Version: 0.1.0
+;; Version: 0.2.0
 ;; Package-Requires: ()
 ;; Keywords: homebrew brew ruby
 ;; Prefix: homebrew
@@ -62,7 +62,7 @@
 
 ;;; Code:
 
-(defconst homebrew-mode-version "0.1.0")
+(defconst homebrew-mode-version "0.2.0")
 
 ;; Customization
 
