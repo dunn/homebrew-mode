@@ -29,16 +29,19 @@
 
 ;; Currently there are just a few commands:
 
-;; - <kbd>C-c h a</kbd>: Insert autotools as dependencies.
-
-;; - <kbd>C-c h c</kbd>: Open a dired buffer in the Homebrew cache
-;;   (default `/Library/Caches/Homebrew`).
-
 ;; - <kbd>C-c h f</kbd>: Download the source file(s) for the formula
 ;;   in the current buffer.
 
 ;; - <kbd>C-c h u</kbd>: Download and unpack the source file(s) for the formula
 ;;   in the current buffer.
+
+;; - <kbd>C-c h a</kbd>: Insert autotools as dependencies.
+
+;; - <kbd>C-c h c</kbd>: Open a dired buffer in the Homebrew cache
+;;   (default `/Library/Caches/Homebrew`).
+
+;; - <kbd>C-c h p</kbd>: Insert Python `resource` blocks (requires poet,
+;;   installed with `pip install homebrew-pypi-poet`).
 
 ;; ## custom variables
 
