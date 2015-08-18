@@ -177,36 +177,20 @@ Ignore the CHANGE of state argument passed by `set-process-sentinel'."
           (dired-jump t (concat dest-dir "/")))
         (message "%s failed with %d" proc-name exit-code)))))
 
-(defun homebrew--fetch (formula build)
-  "Download FORMULA to the Homebrew cache.
-BUILD may be stable, devel or head.  Return the process."
-  (start-process
-    ;; Process name
-    (concat "brew fetch --" build " " formula)
-    ;; Buffer name
-    (concat "*Homebrew: fetch " formula "*")
-    homebrew-executable
-    "fetch" "-fs" (concat "--" build) formula))
+(defun homebrew--start-process (command &optional formula build)
+  "Start an instance of `brew COMMAND` \
+with the specified FORMULA and BUILD type.  Return the process."
 
-(defun homebrew--install (formula build)
-  "Install FORMULA.  BUILD may be stable, devel or head.  Return the process."
-  (start-process
-    ;; Process name
-    (concat "brew install --" build " " formula)
-    ;; Buffer name
-    (concat "*Homebrew: install " formula "*")
-    homebrew-executable
-    "install" "-v" "-fs" (concat "--" build) formula))
-
-(defun homebrew--uninstall (formula)
-  "Uninstall FORMULA.  Return the process."
-  (start-process
-    ;; Process name
-    (concat "brew uninstall " formula)
-    ;; Buffer name
-    (concat "*Homebrew: uninstall " formula "*")
-    homebrew-executable
-    "uninstall" "-v" formula))
+  ;; set 'build' to --stable if not given; it's harmless for commands
+  ;; like `info` and `uninstall`
+  (let* ( (build (or build "--stable"))
+          (command-string (concat "brew " command " -v -fs " build " " formula)) )
+    (start-process
+      ;; Process name
+      command-string
+      ;; Buffer name
+      (concat "*Homebrew: " command-string "*")
+      homebrew-executable command "-v" "-fs" build formula)))
 
 (defun homebrew--formula-file-p (buffer-or-string)
   "Return true if BUFFER-OR-STRING is:
@@ -258,7 +242,9 @@ BUILD may be stable, devel or head."
   (if (not (equal build (or "stable" "devel" "HEAD")))
     (error "Allowed build types are \"stable\", \"devel\", and \"HEAD\"")    )
   (message "Downloading %s source of %s ..." build formula)
-  (set-process-sentinel (homebrew--fetch formula build) 'homebrew--async-simple-alert))
+  (set-process-sentinel
+    (homebrew--start-process "fetch" formula (concat "--" build))
+    'homebrew--async-simple-alert))
 
 (defun homebrew-install (formula build)
   "Start `brew install FORMULA` (of the specified BUILD) \
@@ -267,11 +253,13 @@ in a separate buffer and open a window to that buffer."
                  (read-string "Build type (default stable) " nil nil "stable")))
   (if (not (equal build (or "stable" "devel" "HEAD")))
     (error "Allowed build types are \"stable\", \"devel\", and \"HEAD\"")    )
-  (set-process-sentinel (homebrew--install formula build) 'homebrew--async-simple-alert)
+  (set-process-sentinel
+    (homebrew--start-process "install" formula (concat "--" build))
+    'homebrew--async-simple-alert)
   (if (= 1 (length (window-list)))
       (select-window (split-window-sensibly))
     (other-window 1))
-  (switch-to-buffer (concat "*Homebrew: install " formula "*")))
+  (switch-to-buffer (concat "*Homebrew: brew install -v -fs --" build " " formula "*")))
 
 (defun homebrew-poet-insert (packages)
   "Insert resource blocks for the specified Python PACKAGES."
@@ -292,7 +280,9 @@ in a separate buffer and open a window to that buffer."
   "Uninstall FORMULA , and alert when done."
   (interactive (list (homebrew--formula-from-file buffer-file-name)))
   (message "Uninstalling %s ..." formula)
-  (set-process-sentinel (homebrew--uninstall formula) 'homebrew--async-simple-alert))
+  (set-process-sentinel
+    (homebrew--start-process "uninstall" formula)
+    'homebrew--async-simple-alert))
 
 (defun homebrew-unpack (formula build)
   "Download FORMULA to the Homebrew cache, then unpack and open in a new window.
@@ -302,7 +292,9 @@ BUILD may be stable, devel or head."
   (if (not (equal build (or "stable" "devel" "HEAD")))
     (error "Allowed build types are \"stable\", \"devel\", and \"HEAD\"")    )
   (message "Unpacking %s source of %s ..." build formula)
-  (set-process-sentinel (homebrew--fetch formula build) 'homebrew--async-unpack-and-jump))
+  (set-process-sentinel
+    (homebrew--start-process "unpack" formula (concat "--" build))
+    'homebrew--async-unpack-and-jump))
 
 ;;; Setup
 
