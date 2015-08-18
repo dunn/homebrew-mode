@@ -182,14 +182,18 @@ Ignore the CHANGE of state argument passed by `set-process-sentinel'."
 with the specified FORMULA and BUILD type.  Return the process."
 
   ;; set 'build' to --stable if not given; it's harmless for commands
-  ;; like `info` and `uninstall`
+  ;; like `info` and `uninstall`, but passing nil or empty strings to
+  ;; the args list of `start-process' causes unexpected behavior like
+  ;; removing Caskroom ヽ(。_°)ノ
   (let* ( (build (or build "--stable"))
           (command-string (concat "brew " command " -v -fs " build " " formula)) )
     (start-process
-      ;; Process name
+      ;; Process name:
       command-string
-      ;; Buffer name
+      ;; Buffer name:
       (concat "*Homebrew: " command-string "*")
+      ;; the args passed to the program called by `start-process' have
+      ;; to be multiple strings, rather than a list of strings
       homebrew-executable command "-v" "-fs" build formula)))
 
 (defun homebrew--formula-file-p (buffer-or-string)
