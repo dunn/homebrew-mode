@@ -203,7 +203,7 @@ with the specified FORMULA and BUILD type.  Return the process."
   ;; the args list of `start-process' causes unexpected behavior like
   ;; removing Caskroom ヽ(。_°)ノ
   (let* ( (build (or build "--stable"))
-          (command-string (concat "brew " command " -v -fs " build " " formula)) )
+          (command-string (concat "brew " command " -v --build-from-source " build " " formula)) )
     (start-process
       ;; Process name:
       command-string
@@ -211,7 +211,7 @@ with the specified FORMULA and BUILD type.  Return the process."
       (concat "*Homebrew: " command-string "*")
       ;; the args passed to the program called by `start-process' have
       ;; to be multiple strings, rather than a list of strings
-      homebrew-executable command "-v" "-fs" build formula)))
+      homebrew-executable command "-v" "--build-from-source" build formula)))
 
 (defun homebrew--formula-file-p (buffer-or-string)
   "Return true if BUFFER-OR-STRING is:
@@ -277,7 +277,7 @@ in a separate buffer and open a window to that buffer."
   (set-process-sentinel
     (homebrew--start-process "install" formula (concat "--" build))
     'homebrew--async-alert)
-  (pop-to-buffer (concat "*Homebrew: brew install -v -fs --" build " " formula "*")))
+  (pop-to-buffer (concat "*Homebrew: brew install -v --build-from-source --" build " " formula "*")))
 
 (defun homebrew-poet-insert (packages)
   "Insert resource blocks for the specified Python PACKAGES."
