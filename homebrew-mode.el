@@ -245,6 +245,18 @@ Return nil if there definitely isn't one."
         (setq f (match-string 1 string))))
     f))
 
+(defun homebrew-autotools ()
+  "Insert autotool deps for HEAD builds."
+  ;; TODO: check if libtool is required or not.
+  (interactive)
+  (let ( (indentation (- 4 (current-column)))
+         (padding "") )
+    (dotimes (_ indentation) (setq padding (concat padding " ")))
+    (insert
+      padding "depends_on \"automake\" => :build\n"
+      "    depends_on \"autoconf\" => :build\n"
+      "    depends_on \"libtool\" => :build")))
+
 (defun homebrew-brew-audit (formula)
   "Run `brew audit --strict --online` on FORMULA."
   (interactive (list (homebrew--formula-from-file buffer-file-name)))
@@ -315,18 +327,6 @@ BUILD may be stable, devel or head."
   (set-process-sentinel
     (homebrew--start-formula-build-proc "fetch" formula (concat "--" build))
     'homebrew--async-unpack-and-jump))
-
-(defun homebrew-autotools ()
-  "Insert autotool deps for HEAD builds."
-  ;; TODO: check if libtool is required or not.
-  (interactive)
-  (let ( (indentation (- 4 (current-column)))
-         (padding "") )
-    (dotimes (_ indentation) (setq padding (concat padding " ")))
-    (insert
-      padding "depends_on \"automake\" => :build\n"
-      "    depends_on \"autoconf\" => :build\n"
-      "    depends_on \"libtool\" => :build")))
 
 (defun homebrew-poet-insert (packages)
   "Insert resource blocks for the specified Python PACKAGES."
