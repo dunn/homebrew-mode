@@ -181,20 +181,12 @@ Ignore the CHANGE of state argument passed by `set-process-sentinel'."
                 (result (shell-command-to-string unpack-cmd))
                 ;; * dest-dir will be the location of the unpacked source.
                 (dest-dir))
-          (if (string-match "^Error: Destination \\(.*\\) already exists\\!*" result)
-            (setq dest-dir (match-string 1 result))
-            ;; else
-            ;;
-            ;; TODO: use only one replace-regexp-in-string when
-            ;; parsing the output of `brew unpack`
-            ;;
-            ;; right now the nested replace goes first, removing
-            ;; everything but the first line, then the outer replace
-            ;; removes everything on the first line but the directory name
-            (setq dest-dir (replace-regexp-in-string "==> Unpacking.*to: " ""
-                             (replace-regexp-in-string "\n.*" "" result))))
-            ;; Add a slash to the end so dired enters the directory
-            ;; instead of starting with it under point:
+          ;; capture the unpack directory whether it's already been created or not:
+          (string-match "^Error: Destination \\(.*\\) already exists\\!*" result)
+          (string-match "^==> Unpacking.*to: \\(.*\\)$" result)
+          (setq dest-dir (match-string 1 result))
+          ;; Add a slash to the end so dired enters the directory
+          ;; instead of starting with it under point:
           (dired-jump t (concat dest-dir "/")))
         (message "%s failed with %d" proc-name exit-code)))))
 
