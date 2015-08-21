@@ -144,7 +144,7 @@ Ignore the CHANGE of state argument passed by `set-process-sentinel'."
     (let ( (exit-code (process-exit-status process))
            (proc-name (process-name process)))
       (if (= 0 exit-code)
-        (message "%s completed" proc-name)
+        (message "%s succeeded" proc-name)
         (progn
           (message "%s failed with %d" proc-name exit-code)
           (pop-to-buffer (concat "*Homebrew: " proc-name "*")))))))
