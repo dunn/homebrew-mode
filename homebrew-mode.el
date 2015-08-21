@@ -245,7 +245,7 @@ Return nil if there definitely isn't one."
         (setq f (match-string 1 string))))
     f))
 
-(defun homebrew-audit (formula)
+(defun homebrew-brew-audit (formula)
   "Run `brew audit --strict --online` on FORMULA."
   (interactive (list (homebrew--formula-from-file buffer-file-name)))
   (message "Auditing %s ..." formula)
@@ -273,7 +273,7 @@ Return nil if there definitely isn't one."
       "    depends_on \"autoconf\" => :build\n"
       "    depends_on \"libtool\" => :build")))
 
-(defun homebrew-fetch (formula build)
+(defun homebrew-brew-fetch (formula build)
   "Download FORMULA to the Homebrew cache, and alert when done.
 BUILD may be stable, devel or head."
   (interactive (list (homebrew--formula-from-file buffer-file-name)
@@ -285,7 +285,7 @@ BUILD may be stable, devel or head."
     (homebrew--start-formula-build-proc "fetch" formula (concat "--" build))
     'homebrew--async-alert))
 
-(defun homebrew-install (formula build)
+(defun homebrew-brew-install (formula build)
   "Start `brew install FORMULA` (of the specified BUILD) \
 in a separate buffer and open a window to that buffer."
   (interactive (list (homebrew--formula-from-file buffer-file-name)
@@ -312,7 +312,7 @@ in a separate buffer and open a window to that buffer."
   (interactive)
   (dired-jump t homebrew-cache-dir))
 
-(defun homebrew-test (formula build)
+(defun homebrew-brew-test (formula build)
   "Test FORMULA and alert when done.  BUILD may be stable, devel or head."
   (interactive (list (homebrew--formula-from-file buffer-file-name)
                  (read-string "Build type (default stable) " nil nil "stable")))
@@ -323,7 +323,7 @@ in a separate buffer and open a window to that buffer."
     (homebrew--start-formula-build-proc "test" formula (concat "--" build))
     'homebrew--async-alert))
 
-(defun homebrew-uninstall (formula)
+(defun homebrew-brew-uninstall (formula)
   "Uninstall FORMULA , and alert when done."
   (interactive (list (homebrew--formula-from-file buffer-file-name)))
   (message "Uninstalling %s ..." formula)
@@ -331,7 +331,7 @@ in a separate buffer and open a window to that buffer."
     (homebrew--start-formula-build-proc "uninstall" formula)
     'homebrew--async-alert))
 
-(defun homebrew-unpack (formula build)
+(defun homebrew-brew-unpack (formula build)
   "Download FORMULA to the Homebrew cache, then unpack and open in a new window.
 BUILD may be stable, devel or head."
   (interactive (list (homebrew--formula-from-file buffer-file-name)
