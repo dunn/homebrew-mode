@@ -311,7 +311,7 @@ BUILD may be stable, devel or head."
     (error "Allowed build types are \"stable\", \"devel\", and \"HEAD\"")    )
   (message "Unpacking %s source of %s ..." build formula)
   (set-process-sentinel
-    (homebrew--start-process "unpack" formula (concat "--" build))
+    (homebrew--start-process "fetch" formula (concat "--" build))
     'homebrew--async-unpack-and-jump))
 
 ;;; Setup
