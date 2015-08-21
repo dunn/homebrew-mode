@@ -233,10 +233,9 @@ Return nil if there definitely isn't one."
   (let ((f (and (homebrew--formula-file-p string) (file-exists-p string))))
     ;; f will be nil if STRING isn't a valid pathname
     (if f
-      ;; TODO: do in one
       (progn
-        (setq f (replace-regexp-in-string ".*\/" "" string))
-        (setq f (replace-regexp-in-string "\.rb" "" f))))
+        (string-match ".*\/\\(.*\\)\\.rb" string)
+        (setq f (match-string 1 string))))
     f))
 
 (defun homebrew-autotools ()
