@@ -143,11 +143,21 @@ Ignore the CHANGE of state argument passed by `set-process-sentinel'."
   (when (eq 'exit (process-status process))
     (let ( (exit-code (process-exit-status process))
            (proc-name (process-name process)))
-      (if (= 0 exit-code)
-        (message "%s completed" proc-name)
+      (unless (= 0 exit-code)
         (progn
           (message "%s failed with %d" proc-name exit-code)
-          (pop-to-buffer (concat "*Homebrew: " proc-name "*")))))))
+          (pop-to-buffer (concat "*Homebrew: " proc-name "*")))
+        ;; else
+        (if (string-match "^brew fetch" proc-name)
+          (let ( (fake-fetch (shell-command-to-string proc-name))
+                 (sha256))
+            (string-match "^SHA256:\\ \\([a-zA-Z0-9]*\\)" fake-fetch)
+            (setq sha256 (match-string 1 fake-fetch))
+            (unless (= 64 (length sha256))
+              (error "Unable to calculate SHA256"))
+            (message "SHA256: %s" sha256)
+            (kill-new sha256))))
+      (message "%s completed" proc-name))))
 
 (defun homebrew--async-unpack-and-jump (process &rest change)
   "Called when the `homebrew-unpack' PROCESS completes.
