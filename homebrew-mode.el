@@ -261,18 +261,6 @@ Return nil if there definitely isn't one."
         homebrew-executable "audit" "--strict" "--online" formula))
     'homebrew--async-alert))
 
-(defun homebrew-autotools ()
-  "Insert autotool deps for HEAD builds."
-  ;; TODO: check if libtool is required or not.
-  (interactive)
-  (let ( (indentation (- 4 (current-column)))
-         (padding "") )
-    (dotimes (_ indentation) (setq padding (concat padding " ")))
-    (insert
-      padding "depends_on \"automake\" => :build\n"
-      "    depends_on \"autoconf\" => :build\n"
-      "    depends_on \"libtool\" => :build")))
-
 (defun homebrew-brew-fetch (formula build)
   "Download FORMULA to the Homebrew cache, and alert when done.
 BUILD may be stable, devel or head."
@@ -296,21 +284,6 @@ in a separate buffer and open a window to that buffer."
     (homebrew--start-formula-build-proc "install" formula (concat "--" build))
     'homebrew--async-alert)
   (pop-to-buffer (concat "*Homebrew: brew install -v --build-from-source --" build " " formula "*")))
-
-(defun homebrew-poet-insert (packages)
-  "Insert resource blocks for the specified Python PACKAGES."
-  (interactive "MBuild stanzas for: ")
-  (unless homebrew-poet-executable
-    (error "Cannot find `poet` executable; set `homebrew-poet-executable'"))
-  (dolist (package (split-string packages))
-    (insert (shell-command-to-string
-              (concat homebrew-poet-executable " " package " 2>/dev/null")))
-    (insert "\n")))
-
-(defun homebrew-pop-to-cache ()
-  "Open the Homebrew cache in a new window."
-  (interactive)
-  (dired-jump t homebrew-cache-dir))
 
 (defun homebrew-brew-test (formula build)
   "Test FORMULA and alert when done.  BUILD may be stable, devel or head."
@@ -342,6 +315,33 @@ BUILD may be stable, devel or head."
   (set-process-sentinel
     (homebrew--start-formula-build-proc "fetch" formula (concat "--" build))
     'homebrew--async-unpack-and-jump))
+
+(defun homebrew-autotools ()
+  "Insert autotool deps for HEAD builds."
+  ;; TODO: check if libtool is required or not.
+  (interactive)
+  (let ( (indentation (- 4 (current-column)))
+         (padding "") )
+    (dotimes (_ indentation) (setq padding (concat padding " ")))
+    (insert
+      padding "depends_on \"automake\" => :build\n"
+      "    depends_on \"autoconf\" => :build\n"
+      "    depends_on \"libtool\" => :build")))
+
+(defun homebrew-poet-insert (packages)
+  "Insert resource blocks for the specified Python PACKAGES."
+  (interactive "MBuild stanzas for: ")
+  (unless homebrew-poet-executable
+    (error "Cannot find `poet` executable; set `homebrew-poet-executable'"))
+  (dolist (package (split-string packages))
+    (insert (shell-command-to-string
+              (concat homebrew-poet-executable " " package " 2>/dev/null")))
+    (insert "\n")))
+
+(defun homebrew-pop-to-cache ()
+  "Open the Homebrew cache in a new window."
+  (interactive)
+  (dired-jump t homebrew-cache-dir))
 
 ;;; Setup
 
