@@ -12,9 +12,7 @@ Emacs minor mode for editing [Homebrew](http://brew.sh) formulae.
 
 ## keys and commands
 
-The command prefix is <kbd>C-c h</kbd>.
-
-Currently there are just a few commands:
+The command prefix is <kbd>C-c h</kbd>.  These are the commands currently mapped to it:
 
 - <kbd>C-c h f</kbd>: Download the source file(s) for the formula
   in the current buffer.
@@ -22,7 +20,13 @@ Currently there are just a few commands:
 - <kbd>C-c h u</kbd>: Download and unpack the source file(s) for the formula
   in the current buffer.
 
-- <kbd>C-c h a</kbd>: Insert autotools as dependencies.
+- <kbd>C-c h i</kbd>: Install the formula in the current buffer.
+
+- <kbd>C-c h r</kbd>: Uninstall the formula in the current buffer.
+
+- <kbd>C-c h t</kbd>: Run the test for the formula in the current buffer.
+
+- <kbd>C-c h a</kbd>: Audit the formula in the current buffer.
 
 - <kbd>C-c h c</kbd>: Open a dired buffer in the Homebrew cache
   (default `/Library/Caches/Homebrew`).
