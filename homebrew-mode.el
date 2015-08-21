@@ -180,7 +180,7 @@ Ignore the CHANGE of state argument passed by `set-process-sentinel'."
           (dired-jump t (concat dest-dir "/")))
         (message "%s failed with %d" proc-name exit-code)))))
 
-(defun homebrew--start-process (command &optional formula build)
+(defun homebrew--start-formula-build-proc (command &optional formula build)
   "Start an instance of `brew COMMAND` \
 with the specified FORMULA and BUILD type.  Return the process."
 
@@ -249,7 +249,7 @@ BUILD may be stable, devel or head."
     (error "Allowed build types are \"stable\", \"devel\", and \"HEAD\"")    )
   (message "Downloading %s source of %s ..." build formula)
   (set-process-sentinel
-    (homebrew--start-process "fetch" formula (concat "--" build))
+    (homebrew--start-formula-build-proc "fetch" formula (concat "--" build))
     'homebrew--async-alert))
 
 (defun homebrew-install (formula build)
@@ -260,7 +260,7 @@ in a separate buffer and open a window to that buffer."
   (if (not (equal build (or "stable" "devel" "HEAD")))
     (error "Allowed build types are \"stable\", \"devel\", and \"HEAD\"")    )
   (set-process-sentinel
-    (homebrew--start-process "install" formula (concat "--" build))
+    (homebrew--start-formula-build-proc "install" formula (concat "--" build))
     'homebrew--async-alert)
   (pop-to-buffer (concat "*Homebrew: brew install -v --build-from-source --" build " " formula "*")))
 
@@ -284,7 +284,7 @@ in a separate buffer and open a window to that buffer."
   (interactive (list (homebrew--formula-from-file buffer-file-name)))
   (message "Uninstalling %s ..." formula)
   (set-process-sentinel
-    (homebrew--start-process "uninstall" formula)
+    (homebrew--start-formula-build-proc "uninstall" formula)
     'homebrew--async-alert))
 
 (defun homebrew-unpack (formula build)
@@ -296,7 +296,7 @@ BUILD may be stable, devel or head."
     (error "Allowed build types are \"stable\", \"devel\", and \"HEAD\"")    )
   (message "Unpacking %s source of %s ..." build formula)
   (set-process-sentinel
-    (homebrew--start-process "fetch" formula (concat "--" build))
+    (homebrew--start-formula-build-proc "fetch" formula (concat "--" build))
     'homebrew--async-unpack-and-jump))
 
 ;;; Setup
