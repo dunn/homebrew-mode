@@ -80,18 +80,18 @@
 
 (defcustom homebrew-mode-command-map
   (let ((map (make-sparse-keymap)))
-    (define-key map "a"     #'homebrew-autotools)
+    (define-key map "a"     #'homebrew-audit)
     (define-key map "c"     #'homebrew-pop-to-cache)
     (define-key map "f"     #'homebrew-fetch)
     (define-key map "i"     #'homebrew-install)
     (define-key map "p"     #'homebrew-poet-insert)
     (define-key map "r"     #'homebrew-uninstall)
+    (define-key map "t"     #'homebrew-test)
     (define-key map "u"     #'homebrew-unpack)
     map)
   "Keymap for `homebrew-mode` commands prefixed by homebrew-mode-keymap-prefix."
   :group 'homebrew-mode
-  :type 'string
-  :risky t)
+  :type 'string)
 
 (defvar homebrew-mode-map
   ;; define-key doesn't return the map, so we need a `let`
@@ -228,6 +228,22 @@ Return nil if there definitely isn't one."
         (setq f (match-string 1 string))))
     f))
 
+(defun homebrew-audit (formula)
+  "Run `brew audit --strict --online` on FORMULA."
+  (interactive (list (homebrew--formula-from-file buffer-file-name)))
+  (message "Auditing %s ..." formula)
+  (set-process-sentinel
+    (let* ((command-string (concat "brew audit --strict --online " formula)))
+      (start-process
+        ;; Process name:
+        command-string
+        ;; Buffer name:
+        (concat "*Homebrew: " command-string "*")
+        ;; the args passed to the program called by `start-process' have
+        ;; to be multiple strings, rather than a list of strings
+        homebrew-executable "audit" "--strict" "--online" formula))
+    'homebrew--async-alert))
+
 (defun homebrew-autotools ()
   "Insert autotool deps for HEAD builds."
   ;; TODO: check if libtool is required or not.
@@ -278,6 +294,17 @@ in a separate buffer and open a window to that buffer."
   "Open the Homebrew cache in a new window."
   (interactive)
   (dired-jump t homebrew-cache-dir))
+
+(defun homebrew-test (formula build)
+  "Test FORMULA and alert when done.  BUILD may be stable, devel or head."
+  (interactive (list (homebrew--formula-from-file buffer-file-name)
+                 (read-string "Build type (default stable) " nil nil "stable")))
+  (if (not (equal build (or "stable" "devel" "HEAD")))
+    (error "Allowed build types are \"stable\", \"devel\", and \"HEAD\"")    )
+  (message "Testing %s build of %s ..." build formula)
+  (set-process-sentinel
+    (homebrew--start-formula-build-proc "test" formula (concat "--" build))
+    'homebrew--async-alert))
 
 (defun homebrew-uninstall (formula)
   "Uninstall FORMULA , and alert when done."
