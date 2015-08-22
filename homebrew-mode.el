@@ -164,7 +164,12 @@ Ignore the CHANGE of state argument passed by `set-process-sentinel'."
         (message "%s succeeded" proc-name)
         (progn
           (message "%s failed with %d" proc-name exit-code)
-          (pop-to-buffer (concat "*Homebrew: " proc-name "*")))))))
+          (pop-to-buffer (concat "*Homebrew: " proc-name "*"))
+          ;; if the same command has been run and failed recently, the
+          ;; buffer will still be there with point at wherever it was
+          ;; (probably at the previous failure), so move point to the
+          ;; end in order to avoid confusion.
+          (goto-char (point-max)))))))
 
 (defun homebrew--async-unpack-and-jump (process &rest change)
   "Called when the `homebrew-unpack' PROCESS completes.
