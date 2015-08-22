@@ -97,14 +97,14 @@
 
 (defcustom homebrew-mode-command-map
   (let ((map (make-sparse-keymap)))
-    (define-key map "a"     #'homebrew-audit)
+    (define-key map "a"     #'homebrew-brew-audit)
     (define-key map "c"     #'homebrew-pop-to-cache)
-    (define-key map "f"     #'homebrew-fetch)
-    (define-key map "i"     #'homebrew-install)
+    (define-key map "f"     #'homebrew-brew-fetch)
+    (define-key map "i"     #'homebrew-brew-install)
     (define-key map "p"     #'homebrew-poet-insert)
-    (define-key map "r"     #'homebrew-uninstall)
-    (define-key map "t"     #'homebrew-test)
-    (define-key map "u"     #'homebrew-unpack)
+    (define-key map "r"     #'homebrew-brew-uninstall)
+    (define-key map "t"     #'homebrew-brew-test)
+    (define-key map "u"     #'homebrew-brew-unpack)
     map)
   "Keymap for `homebrew-mode` commands prefixed by homebrew-mode-keymap-prefix."
   :group 'homebrew-mode
