@@ -283,7 +283,7 @@ Return nil if there definitely isn't one."
 BUILD may be stable, devel or head."
   (interactive (list (homebrew--formula-from-file buffer-file-name)
                  (read-string "Build type (default stable) " nil nil "stable")))
-  (if (not (equal build (or "stable" "devel" "HEAD")))
+  (if (not (or (equal build "stable") (equal build "devel") (equal build "HEAD")))
     (error "Allowed build types are \"stable\", \"devel\", and \"HEAD\"")    )
   (message "Downloading %s source of %s ..." build formula)
   (set-process-sentinel
@@ -295,7 +295,7 @@ BUILD may be stable, devel or head."
 in a separate buffer and open a window to that buffer."
   (interactive (list (homebrew--formula-from-file buffer-file-name)
                  (read-string "Build type (default stable) " nil nil "stable")))
-  (if (not (equal build (or "stable" "devel" "HEAD")))
+  (if (not (or (equal build "stable") (equal build "devel") (equal build "HEAD")))
     (error "Allowed build types are \"stable\", \"devel\", and \"HEAD\"")    )
   (set-process-sentinel
     (homebrew--start-formula-build-proc "install" formula (concat "--" build))
@@ -306,7 +306,7 @@ in a separate buffer and open a window to that buffer."
   "Test FORMULA and alert when done.  BUILD may be stable, devel or head."
   (interactive (list (homebrew--formula-from-file buffer-file-name)
                  (read-string "Build type (default stable) " nil nil "stable")))
-  (if (not (equal build (or "stable" "devel" "HEAD")))
+  (if (not (or (equal build "stable") (equal build "devel") (equal build "HEAD")))
     (error "Allowed build types are \"stable\", \"devel\", and \"HEAD\"")    )
   (message "Testing %s build of %s ..." build formula)
   (set-process-sentinel
@@ -326,7 +326,7 @@ in a separate buffer and open a window to that buffer."
 BUILD may be stable, devel or head."
   (interactive (list (homebrew--formula-from-file buffer-file-name)
                  (read-string "Build type (default stable) " nil nil "stable")))
-  (if (not (equal build (or "stable" "devel" "HEAD")))
+  (if (not (or (equal build "stable") (equal build "devel") (equal build "HEAD")))
     (error "Allowed build types are \"stable\", \"devel\", and \"HEAD\"")    )
   (message "Unpacking %s source of %s ..." build formula)
   (set-process-sentinel
