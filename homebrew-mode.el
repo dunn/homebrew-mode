@@ -300,7 +300,11 @@ in a separate buffer and open a window to that buffer."
   (set-process-sentinel
     (homebrew--start-formula-build-proc "install" formula (concat "--" build))
     'homebrew--async-alert)
-  (pop-to-buffer (concat "*Homebrew: brew install -v --build-from-source --" build " " formula "*")))
+  (let ((install-window (if (= 1 (length (window-list)))
+                            (split-window-sensibly)
+                          (next-window))))
+    (with-selected-window install-window
+      (switch-to-buffer (concat "*Homebrew: brew install -v --build-from-source --" build " " formula "*")))))
 
 (defun homebrew-brew-test (formula build)
   "Test FORMULA and alert when done.  BUILD may be stable, devel or head."
