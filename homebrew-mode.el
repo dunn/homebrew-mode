@@ -3,7 +3,7 @@
 ;; Copyright (C) 2015 Alex Dunn
 
 ;; Author: Alex Dunn <dunn.alex@gmail.com>
-;; URL:
+;; URL: https://github.com/dunn/homebrew-mode
 ;; Version: 0.4.0
 ;; Package-Requires: ()
 ;; Keywords: homebrew brew ruby
