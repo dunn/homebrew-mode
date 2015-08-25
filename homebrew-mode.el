@@ -300,6 +300,7 @@ in a separate buffer and open a window to that buffer."
   (set-process-sentinel
     (homebrew--start-formula-build-proc "install" formula (concat "--" build))
     'homebrew--async-alert)
+  ;; This is instead of `pop-to-buffer' since we don't want the install buffer activated
   (let ((install-window (if (= 1 (length (window-list)))
                             (split-window-sensibly)
                           (next-window))))
