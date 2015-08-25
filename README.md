@@ -31,6 +31,11 @@ The command prefix is <kbd>C-c h</kbd>.  These are the commands currently mapped
 - <kbd>C-c h c</kbd>: Open a dired buffer in the Homebrew cache
   (default `/Library/Caches/Homebrew`).
 
+- <kbd>C-c h d</kbd>: Add `depends_on` lines for the specified
+  formulae.  Call with one prefix (<kbd>C-u</kbd>) argument to make
+  them build-time dependencies; call with two (<kbd>C-u C-u</kbd>) for
+  run-time.
+
 - <kbd>C-c h p</kbd>: Insert Python `resource` blocks (requires poet,
   installed with `pip install homebrew-pypi-poet`).
 

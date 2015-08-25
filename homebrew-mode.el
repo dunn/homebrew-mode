@@ -57,6 +57,11 @@
 ;; - <kbd>C-c h c</kbd>: Open a dired buffer in the Homebrew cache
 ;;   (default `/Library/Caches/Homebrew`).
 
+;; - <kbd>C-c h d</kbd>: Add `depends_on` lines for the specified
+;;   formulae.  Call with one prefix (<kbd>C-u</kbd>) argument to make
+;;   them build-time dependencies; call with two (<kbd>C-u C-u</kbd>) for
+;;   run-time.
+
 ;; - <kbd>C-c h p</kbd>: Insert Python `resource` blocks (requires poet,
 ;;   installed with `pip install homebrew-pypi-poet`).
 
@@ -99,6 +104,7 @@
   (let ((map (make-sparse-keymap)))
     (define-key map "a"     #'homebrew-brew-audit)
     (define-key map "c"     #'homebrew-pop-to-cache)
+    (define-key map "d"     #'homebrew-add-deps)
     (define-key map "f"     #'homebrew-brew-fetch)
     (define-key map "i"     #'homebrew-brew-install)
     (define-key map "p"     #'homebrew-poet-insert)
@@ -249,6 +255,30 @@ Return nil if there definitely isn't one."
         (string-match ".*\/\\(.*\\)\\.rb" string)
         (setq f (match-string 1 string))))
     f))
+
+(defun homebrew-add-deps (type &rest formulae)
+  "Add `depends_on` lines of TYPE ('run', 'build', or nil) \
+for the given FORMULAE.
+
+One prefix argument makes them build-time dependencies.  Two makes them run-time."
+  (interactive "P\nMAdd dependencies: ")
+  (let ( (indentation (- 2 (current-column)))
+         (padding "") )
+    (dotimes (_ indentation) (setq padding (concat padding " ")))
+    ;; We run `dolist' twice since each element in FORMULAE might itself
+    ;; be a list of formulae
+    (dolist (fgroup formulae)
+      (setq fgroup (split-string fgroup))
+      (dolist (formula fgroup)
+        (insert padding "depends_on \"" formula "\"")
+        (if type
+          (progn
+            (insert " => :")
+            (if (> 5 (car type))
+              (insert "build")
+              (insert "run"))))
+        (if (< 1 (length fgroup))
+          (insert "\n"))))))
 
 (defun homebrew-autotools ()
   "Insert autotool deps for HEAD builds."
