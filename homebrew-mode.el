@@ -410,7 +410,7 @@ BUILD may be stable, devel or head."
 ;;;###autoload
 (define-minor-mode homebrew-mode
   "Helper functions for editing Homebrew formulae"
-  :lighter "Brew"
+  :lighter " Brew"
   :keymap homebrew-mode-map)
 
 (provide 'homebrew-mode)
