@@ -16,7 +16,7 @@ compile: $(LISPS)
 
 install: compile
 	mkdir -p $(lispdir)
-	install -m 644 $(LISPS) $(lispdir)
+	install -m 644 $(LISPS) *.elc $(lispdir)
 
 test:
 	$(emacs) --batch -Q -l ert -l ./homebrew-mode.el -l ./tests/homebrew-mode-tests.el \
