@@ -1,4 +1,4 @@
-.PHONY: compile clean major minor patch
+.PHONY: compile clean major minor patch test
 
 prefix ?= /usr/local
 lispdir?= $(prefix)/share/emacs/site-lisp/homebrew-mode
@@ -17,6 +17,10 @@ compile: $(LISPS)
 install: compile
 	mkdir -p $(lispdir)
 	install -m 644 $(LISPS) $(lispdir)
+
+test:
+	$(emacs) --batch -Q -l ert -l ./homebrew-mode.el -l ./tests/homebrew-mode-tests.el \
+		--eval "(ert-run-tests-batch-and-exit '(not (tag interactive)))"
 
 clean:
 	rm *.elc *~
