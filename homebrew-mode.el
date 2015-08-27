@@ -81,6 +81,7 @@
 
 (require 'dired)
 (require 'diff-mode)
+(require 'whitespace)
 
 ;;; Code:
 
