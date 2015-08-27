@@ -33,7 +33,7 @@
 ;; ```elisp
 ;; (add-to-list 'load-path "/where/is/homebrew-mode")
 ;; (require 'homebrew-mode)
-;; (homebrew-mode-default-hooks)
+;; (global-homebrew-mode)
 ;; ```
 
 ;; ## keys and commands

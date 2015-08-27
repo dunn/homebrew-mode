@@ -7,7 +7,7 @@ Emacs minor mode for editing [Homebrew](http://brew.sh) formulae.
 ```elisp
 (add-to-list 'load-path "/where/is/homebrew-mode")
 (require 'homebrew-mode)
-(homebrew-mode-default-hooks)
+(global-homebrew-mode)
 ```
 
 ## keys and commands
