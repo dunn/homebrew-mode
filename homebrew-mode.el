@@ -386,33 +386,32 @@ BUILD may be stable, devel or head."
 
 ;;; Setup
 
-(defun homebrew-mode-default-hooks ()
-  "Register hooks for starting homebrew-mode."
-  (add-hook 'find-file-hook
-    (lambda ()
-      (if (homebrew--formula-file-p (current-buffer))
-        (homebrew-mode))))
-  (add-hook 'homebrew-mode-hook
-    (lambda ()
-      (font-lock-add-keywords nil
-        ;; ganked from `diff-font-lock-keywords'; why it can't be simpler idk
-        '( ("\\(^@@ -\\([0-9]+\\)\\(?:,\\([0-9]+\\)\\)? \\+\\([0-9]+\\)\\(?:,\\([0-9]+\\)\\)? @@\\)\\(.*\\)$"
-             (1 diff-hunk-header-face) (6 diff-function-face))
-           ("^\\(---\\|\\+\\+\\+\\|\\*\\*\\*\\) \\([^\t\n]+?\\)\\(?:\t.*\\| \\(\\*\\*\\*\\*\\|----\\)\\)?\n"
-             (0 diff-header-face)
-             (2 (if (not (match-end 3)) diff-file-header-face) prepend))
-           ("^\\([-<]\\)\\(.*\n\\)" (1 diff-indicator-removed-face) (2 diff-removed-face))
-           ("^\\([+>]\\)\\(.*\n\\)" (1 diff-indicator-added-face) (2 diff-added-face))))))
-  (add-hook 'homebrew-mode-hook
-    (lambda ()
-      (if (and homebrew-patch-whitespace-mode (string-match "__END__" (buffer-string)))
-        (whitespace-mode)))))
-
 ;;;###autoload
 (define-minor-mode homebrew-mode
   "Helper functions for editing Homebrew formulae"
   :lighter " Brew"
-  :keymap homebrew-mode-map)
+  :keymap homebrew-mode-map
+
+  ;; Colorize inline patches
+  (if (string-match "__END__" (buffer-string))
+    (font-lock-add-keywords nil
+      ;; ganked from `diff-font-lock-keywords'; why it can't be simpler idk
+      '( ("\\(^@@ -\\([0-9]+\\)\\(?:,\\([0-9]+\\)\\)? \\+\\([0-9]+\\)\\(?:,\\([0-9]+\\)\\)? @@\\)\\(.*\\)$"
+           (1 diff-hunk-header-face) (6 diff-function-face))
+         ("^\\(---\\|\\+\\+\\+\\|\\*\\*\\*\\) \\([^\t\n]+?\\)\\(?:\t.*\\| \\(\\*\\*\\*\\*\\|----\\)\\)?\n"
+           (0 diff-header-face)
+           (2 (if (not (match-end 3)) diff-file-header-face) prepend))
+         ("^\\([-<]\\)\\(.*\n\\)" (1 diff-indicator-removed-face) (2 diff-removed-face))
+         ("^\\([+>]\\)\\(.*\n\\)" (1 diff-indicator-added-face) (2 diff-added-face))))
+    (if homebrew-patch-whitespace-mode
+      (whitespace-mode))))
+
+;;;###autoload
+(define-globalized-minor-mode global-homebrew-mode homebrew-mode
+  (lambda ()
+    (if (homebrew--formula-file-p (current-buffer))
+      (homebrew-mode)))
+  :init-value nil)
 
 (provide 'homebrew-mode)
 
