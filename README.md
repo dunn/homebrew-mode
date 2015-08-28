@@ -1,5 +1,8 @@
 # hombrew-mode
 
+[![Melpa Status](http://melpa.org/packages/homebrew-mode-badge.svg)](http://melpa.org/#/homebrew-mode)
+[![Melpa Stable Status](http://stable.melpa.org/packages/homebrew-mode-badge.svg)](http://stable.melpa.org/#/homebrew-mode)
+
 Emacs minor mode for editing [Homebrew](http://brew.sh) formulae.
 
 ## setup
