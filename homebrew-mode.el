@@ -4,7 +4,7 @@
 
 ;; Author: Alex Dunn <dunn.alex@gmail.com>
 ;; URL: https://github.com/dunn/homebrew-mode
-;; Version: 1.0.0
+;; Version: 1.1.0
 ;; Package-Requires: ((inf-ruby "2.4.0"))
 ;; Keywords: homebrew brew ruby
 ;; Prefix: homebrew
@@ -92,7 +92,7 @@
 
 ;;; Code:
 
-(defconst homebrew-mode-version "1.0.0")
+(defconst homebrew-mode-version "1.1.0")
 
 ;; Customization
 
