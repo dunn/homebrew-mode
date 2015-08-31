@@ -50,12 +50,12 @@
 
 ;; - <kbd>C-c C-h r</kbd>: Uninstall the formula in the current buffer.
 
-;; - <kbd>C-c C-h s</kbd>: Open a new buffer running the Homebrew
-;;   Interactive Shell (`brew irb`).
-
 ;; - <kbd>C-c C-h t</kbd>: Run the test for the formula in the current buffer.
 
 ;; - <kbd>C-c C-h a</kbd>: Audit the formula in the current buffer.
+
+;; - <kbd>C-c C-h s</kbd>: Open a new buffer running the Homebrew
+;;   Interactive Shell (`brew irb`).
 
 ;; - <kbd>C-c C-h c</kbd>: Open a dired buffer in the Homebrew cache
 ;;   (default `/Library/Caches/Homebrew`).
