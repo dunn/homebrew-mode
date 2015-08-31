@@ -5,7 +5,7 @@
 ;; Author: Alex Dunn <dunn.alex@gmail.com>
 ;; URL: https://github.com/dunn/homebrew-mode
 ;; Version: 1.0.0
-;; Package-Requires: ()
+;; Package-Requires: ((inf-ruby "2.4.0"))
 ;; Keywords: homebrew brew ruby
 ;; Prefix: homebrew
 
@@ -50,6 +50,9 @@
 
 ;; - <kbd>C-c C-h r</kbd>: Uninstall the formula in the current buffer.
 
+;; - <kbd>C-c C-h s</kbd>: Open a new buffer running the Homebrew
+;;   Interactive Shell (`brew irb`).
+
 ;; - <kbd>C-c C-h t</kbd>: Run the test for the formula in the current buffer.
 
 ;; - <kbd>C-c C-h a</kbd>: Audit the formula in the current buffer.
@@ -77,11 +80,15 @@
 ;;   have inline patches, set `homebrew-patch-whitespace-mode` to
 ;;   `t`. It’s off by default since it looks ugly.
 
-;;; Requires:
+;;; Dependencies
 
+;; built-in
 (require 'dired)
 (require 'diff-mode)
 (require 'whitespace)
+
+;; external
+(require 'inf-ruby)
 
 ;;; Code:
 
@@ -110,6 +117,7 @@
     (define-key map "i"     #'homebrew-brew-install)
     (define-key map "p"     #'homebrew-poet-insert)
     (define-key map "r"     #'homebrew-brew-uninstall)
+    (define-key map "s"     #'homebrew-pop-to-shell)
     (define-key map "t"     #'homebrew-brew-test)
     (define-key map "u"     #'homebrew-brew-unpack)
     map)
@@ -383,6 +391,16 @@ BUILD may be stable, devel or head."
   "Open the Homebrew cache in a new window."
   (interactive)
   (dired-jump t homebrew-cache-dir))
+
+(defun homebrew-pop-to-shell ()
+  "Pop to a buffer and start a Ruby REPL with the core Homebrew libraries loaded."
+  (interactive)
+  (run-ruby (concat "irb --prompt default --noreadline -r irb/completion -I "
+              homebrew-prefix "/Library/Homebrew -r "
+              homebrew-prefix "/Library/Homebrew/global.rb -r "
+              homebrew-prefix "/Library/Homebrew/formula.rb -r "
+              homebrew-prefix "/Library/Homebrew/keg.rb")
+    "brew irb"))
 
 ;;; Setup
 
