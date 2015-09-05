@@ -343,7 +343,8 @@ Pop the process buffer on failure."
                           (next-window))))
     (with-selected-window install-window
       (switch-to-buffer (concat "*" homebrew-executable " install -v --build-from-source "
-                          formula " " (string-trim-right (mapconcat 'identity args " ")) "*")))))
+                          formula " " (string-trim-right (mapconcat 'identity args " ")) "*"))
+      (goto-char (point-max)))))
 
 (defun homebrew-brew-test (formula &rest args)
   "Test FORMULA  with ARGS and alert when done."
