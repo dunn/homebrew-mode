@@ -5,7 +5,7 @@
 ;; Author: Alex Dunn <dunn.alex@gmail.com>
 ;; URL: https://github.com/dunn/homebrew-mode
 ;; Version: 1.1.1
-;; Package-Requires: ((inf-ruby "2.4.0"))
+;; Package-Requires: ((emacs "24.4") (inf-ruby "2.4.0") (dash "1.2.0"))
 ;; Keywords: homebrew brew ruby
 ;; Prefix: homebrew
 
@@ -85,9 +85,11 @@
 ;; built-in
 (require 'dired)
 (require 'diff-mode)
+(require 'subr-x)
 (require 'whitespace)
 
 ;; external
+(require 'dash)
 (require 'inf-ruby)
 
 ;;; Code:
@@ -179,7 +181,7 @@ Ignore the CHANGE of state argument passed by `set-process-sentinel'."
         (message "%s succeeded" proc-name)
         (progn
           (message "%s failed with %d" proc-name exit-code)
-          (pop-to-buffer (concat "*Homebrew: " proc-name "*"))
+          (pop-to-buffer (concat "*" proc-name "*"))
           ;; if the same command has been run and failed recently, the
           ;; buffer will still be there with point at wherever it was
           ;; (probably at the previous failure), so move point to the
@@ -215,26 +217,22 @@ Ignore the CHANGE of state argument passed by `set-process-sentinel'."
           ;; Add a slash to the end so dired enters the directory
           ;; instead of starting with it under point:
           (dired-jump t (concat dest-dir "/")))
-        (message "%s failed with %d" proc-name exit-code)))))
+        (progn
+          (message "%s failed with %d" proc-name exit-code)
+          (pop-to-buffer (concat "*" proc-name "*")))))))
 
-(defun homebrew--start-formula-build-proc (command &optional formula build)
-  "Start an instance of `brew COMMAND` \
-with the specified FORMULA and BUILD type.  Return the process."
-
-  ;; set 'build' to --stable if not given; it's harmless for commands
-  ;; like `info` and `uninstall`, but passing nil or empty strings to
-  ;; the args list of `start-process' causes unexpected behavior like
-  ;; removing Caskroom ヽ(。_°)ノ
-  (let* ( (build (or build "--stable"))
-          (command-string (concat "brew " command " -v --build-from-source " build " " formula)) )
-    (start-process
+(defun homebrew--start-process (command &rest args)
+  "Start an instance of `COMMAND` with the specified ARGS.
+Return the process."
+  (let ((command-string (concat command " " (mapconcat 'identity (-flatten args) " "))))
+    (apply 'start-process
       ;; Process name:
       command-string
       ;; Buffer name:
-      (concat "*Homebrew: " command-string "*")
-      ;; the args passed to the program called by `start-process' have
-      ;; to be multiple strings, rather than a list of strings
-      homebrew-executable command "-v" "--build-from-source" build formula)))
+      (concat "*" command-string "*")
+      ;; For `brew` at least, the subcommand (e.g., 'install') must be
+      ;; the first element of ARGS.
+      command (-flatten args))))
 
 (defun homebrew--formula-file-p (buffer-or-string)
   "Return true if BUFFER-OR-STRING is:
@@ -264,6 +262,13 @@ Return nil if there definitely isn't one."
         (string-match ".*\/\\(.*\\)\\.rb" string)
         (setq f (match-string 1 string))))
     f))
+
+;; TODO: why
+(defun homebrew--process-args (args)
+  "Make ARGS suitable for passing to `start-process'."
+  (split-string (mapconcat 'identity args " ")))
+
+;; User functions
 
 (defun homebrew-add-deps (type &rest formulae)
   "Add `depends_on` lines of TYPE ('run', 'build', or nil) \
@@ -302,79 +307,78 @@ One prefix argument makes them build-time dependencies.  Two makes them run-time
       "    depends_on \"libtool\" => :build")))
 
 (defun homebrew-brew-audit (formula)
-  "Run `brew audit --strict --online` on FORMULA."
+  "Run `brew audit --strict --online` on FORMULA.
+Pop the process buffer on failure."
   (interactive (list (homebrew--formula-from-file buffer-file-name)))
   (message "Auditing %s ..." formula)
   (set-process-sentinel
-    (let* ((command-string (concat "brew audit --strict --online " formula)))
-      (start-process
-        ;; Process name:
-        command-string
-        ;; Buffer name:
-        (concat "*Homebrew: " command-string "*")
-        ;; the args passed to the program called by `start-process' have
-        ;; to be multiple strings, rather than a list of strings
-        homebrew-executable "audit" "--strict" "--online" formula))
+    (homebrew--start-process homebrew-executable "audit" "--strict" "--online" formula)
     'homebrew--async-alert))
 
-(defun homebrew-brew-fetch (formula build)
-  "Download FORMULA to the Homebrew cache, and alert when done.
-BUILD may be stable, devel or head."
+(defun homebrew-brew-fetch (formula &rest args)
+  "Download FORMULA, using ARGS, to the Homebrew cache, and alert when done."
   (interactive (list (homebrew--formula-from-file buffer-file-name)
-                 (read-string "Build type (default stable) " nil nil "stable")))
-  (if (not (or (equal build "stable") (equal build "devel") (equal build "HEAD")))
-    (error "Allowed build types are \"stable\", \"devel\", and \"HEAD\"")    )
-  (message "Downloading %s source of %s ..." build formula)
+                 (read-string "Arguments (default --stable) " nil nil "--stable")))
+  (message "Downloading %s ..." formula)
   (set-process-sentinel
-    (homebrew--start-formula-build-proc "fetch" formula (concat "--" build))
+    (homebrew--start-process
+      homebrew-executable "fetch" "-v"
+      formula
+      (homebrew--process-args args))
     'homebrew--async-alert))
 
-(defun homebrew-brew-install (formula build)
-  "Start `brew install FORMULA` (of the specified BUILD) \
-in a separate buffer and open a window to that buffer."
+(defun homebrew-brew-install (formula &rest args)
+  "Start `brew install FORMULA ARGS` in a separate buffer and open a window to that buffer."
   (interactive (list (homebrew--formula-from-file buffer-file-name)
-                 (read-string "Build type (default stable) " nil nil "stable")))
-  (if (not (or (equal build "stable") (equal build "devel") (equal build "HEAD")))
-    (error "Allowed build types are \"stable\", \"devel\", and \"HEAD\"")    )
+                 (read-string "Arguments (default --stable) " nil nil "--stable")))
   (set-process-sentinel
-    (homebrew--start-formula-build-proc "install" formula (concat "--" build))
+    (homebrew--start-process homebrew-executable
+      "install" "-v" "--build-from-source"
+      formula
+      (homebrew--process-args args))
     'homebrew--async-alert)
   ;; This is instead of `pop-to-buffer' since we don't want the install buffer activated
   (let ((install-window (if (= 1 (length (window-list)))
                             (split-window-sensibly)
                           (next-window))))
     (with-selected-window install-window
-      (switch-to-buffer (concat "*Homebrew: brew install -v --build-from-source --" build " " formula "*")))))
+      (switch-to-buffer (concat "*" homebrew-executable " install -v --build-from-source "
+                          formula " " (string-trim-right (mapconcat 'identity args " ")) "*")))))
 
-(defun homebrew-brew-test (formula build)
-  "Test FORMULA and alert when done.  BUILD may be stable, devel or head."
+(defun homebrew-brew-test (formula &rest args)
+  "Test FORMULA  with ARGS and alert when done."
   (interactive (list (homebrew--formula-from-file buffer-file-name)
-                 (read-string "Build type (default stable) " nil nil "stable")))
-  (if (not (or (equal build "stable") (equal build "devel") (equal build "HEAD")))
-    (error "Allowed build types are \"stable\", \"devel\", and \"HEAD\"")    )
-  (message "Testing %s build of %s ..." build formula)
+                 (read-string "Arguments (default --stable) " nil nil "--stable")))
+
+  (message "Testing %s ..." formula)
   (set-process-sentinel
-    (homebrew--start-formula-build-proc "test" formula (concat "--" build))
+    (homebrew--start-process
+      homebrew-executable
+      "test"
+      formula
+      (homebrew--process-args args))
     'homebrew--async-alert))
 
 (defun homebrew-brew-uninstall (formula)
-  "Uninstall FORMULA , and alert when done."
+  "Uninstall FORMULA, and alert when done."
   (interactive (list (homebrew--formula-from-file buffer-file-name)))
   (message "Uninstalling %s ..." formula)
   (set-process-sentinel
-    (homebrew--start-formula-build-proc "uninstall" formula)
+    (homebrew--start-process homebrew-executable "uninstall" formula)
     'homebrew--async-alert))
 
-(defun homebrew-brew-unpack (formula build)
-  "Download FORMULA to the Homebrew cache, then unpack and open in a new window.
-BUILD may be stable, devel or head."
+(defun homebrew-brew-unpack (formula &rest args)
+  "Download FORMULA with ARGS to the Homebrew cache, then unpack and open in a new window."
   (interactive (list (homebrew--formula-from-file buffer-file-name)
-                 (read-string "Build type (default stable) " nil nil "stable")))
-  (if (not (or (equal build "stable") (equal build "devel") (equal build "HEAD")))
-    (error "Allowed build types are \"stable\", \"devel\", and \"HEAD\"")    )
-  (message "Unpacking %s source of %s ..." build formula)
+                 (read-string "Arguments (default --stable) " nil nil "--stable")))
+
+  (message "Unpacking %s ..." formula)
   (set-process-sentinel
-    (homebrew--start-formula-build-proc "fetch" formula (concat "--" build))
+    (homebrew--start-process
+      homebrew-executable
+      "fetch"
+      formula
+      (homebrew--process-args args))
     'homebrew--async-unpack-and-jump))
 
 (defun homebrew-poet-insert (packages)
