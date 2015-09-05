@@ -5,6 +5,7 @@ lispdir?= $(prefix)/share/emacs/site-lisp/homebrew-mode
 
 emacs    ?= $(shell which emacs)
 inf_ruby ?= /usr/local/share/emacs/site-lisp/inf-ruby/
+dash     ?= /usr/local/share/emacs/site-lisp/dash/
 
 BASE_FILE = homebrew-mode.el
 LISPS = $(BASE_FILE)
@@ -12,14 +13,14 @@ LISPS = $(BASE_FILE)
 default: compile
 
 compile: $(LISPS)
-	$(emacs) --batch -Q --directory $(inf_ruby) -f batch-byte-compile $<
+	$(emacs) --batch -Q --directory $(inf_ruby) --directory $(dash) -f batch-byte-compile $<
 
 install: compile
 	mkdir -p $(lispdir)
 	install -m 644 $(LISPS) *.elc $(lispdir)
 
 test:
-	$(emacs) --batch -Q --load ert --directory $(inf_ruby) \
+	$(emacs) --batch -Q --load ert --directory $(inf_ruby) --directory $(dash) \
 		--load ./homebrew-mode.el --load ./tests/homebrew-ert-tests.el \
 		--eval "(ert-run-tests-batch-and-exit '(not (tag interactive)))"
 
