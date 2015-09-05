@@ -201,7 +201,7 @@ Ignore the CHANGE of state argument passed by `set-process-sentinel'."
         ;;
         ;; * Extract the formula name from the name of PROCESS.
         ;;
-        ;; * We do the actual unpacking in the let* block, and
+        ;; * We do the actual unpacking during the let* assignment;
         ;;   'result' is the output of `brew unpack`.
         (let* ( (default-directory homebrew-cache-dir)
                 (formula (replace-regexp-in-string ".*\\ " "" proc-name))
