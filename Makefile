@@ -20,7 +20,7 @@ install: compile
 
 test:
 	$(emacs) --batch -Q --load ert --directory $(inf_ruby) \
-		--load ./homebrew-mode.el --load ./tests/homebrew-mode-tests.el \
+		--load ./homebrew-mode.el --load ./tests/homebrew-ert-tests.el \
 		--eval "(ert-run-tests-batch-and-exit '(not (tag interactive)))"
 
 clean:
