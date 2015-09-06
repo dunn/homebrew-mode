@@ -157,6 +157,14 @@ If you edit this variable, make sure the new value passes the formula-detection 
   :type 'list
   :risky t)
 
+(defcustom homebrew-default-args
+  '( "--verbose"
+     "--build-from-source" )
+  "Arguments passed to every invocation of `brew`."
+  :group 'homebrew-mode
+  :type 'list
+  :risky t)
+
 (defcustom homebrew-patch-whitespace-mode nil
   "Turn on `whitespace-mode' when editing formulae with inline patches."
   :group 'homebrew-mode
@@ -176,7 +184,7 @@ Pop to the process buffer when it fails.
 Ignore the CHANGE of state argument passed by `set-process-sentinel'."
   (when (eq 'exit (process-status process))
     (let ( (exit-code (process-exit-status process))
-           (proc-name (process-name process)))
+           (proc-name (homebrew--get-process-name process)))
       (if (= 0 exit-code)
         (message "%s succeeded" proc-name)
         (progn
@@ -194,7 +202,7 @@ Unpack and enter the source dir.
 Ignore the CHANGE of state argument passed by `set-process-sentinel'."
   (when (eq 'exit (process-status process))
     (let* ( (exit-code (process-exit-status process))
-            (proc-name (process-name process))
+            (proc-name (homebrew--get-process-name process))
             ;; is there no replace-in-string?
             (unpack-cmd (replace-regexp-in-string "fetch" "unpack" proc-name)))
       (if (= 0 exit-code)
@@ -223,16 +231,18 @@ Ignore the CHANGE of state argument passed by `set-process-sentinel'."
 
 (defun homebrew--start-process (command &rest args)
   "Start an instance of `COMMAND` with the specified ARGS.
+
+For `brew` at least, the primary subcommand (e.g., 'install')
+must be the first element of ARGS.
+
 Return the process."
-  (let ((command-string (concat command " " (mapconcat 'identity (-flatten args) " "))))
+  (let ((command-string (concat command " " (nth 0 args) " " (nth 1 args))))
     (apply 'start-process
       ;; Process name:
       command-string
       ;; Buffer name:
       (concat "*" command-string "*")
-      ;; For `brew` at least, the subcommand (e.g., 'install') must be
-      ;; the first element of ARGS.
-      command (-flatten args))))
+      command (-flatten (cons args homebrew-default-args)))))
 
 (defun homebrew--formula-file-p (buffer-or-string)
   "Return true if BUFFER-OR-STRING is:
@@ -262,6 +272,11 @@ Return nil if there definitely isn't one."
         (string-match ".*\/\\(.*\\)\\.rb" string)
         (setq f (match-string 1 string))))
     f))
+
+;; TODO: lol
+(defun homebrew--get-process-name (process)
+  "Return a simplified version of a PROCESS name."
+  (mapconcat 'identity (-take 3 (split-string (process-name process))) " "))
 
 ;; TODO: why
 (defun homebrew--process-args (args)
@@ -322,7 +337,8 @@ Pop the process buffer on failure."
   (message "Downloading %s ..." formula)
   (set-process-sentinel
     (homebrew--start-process
-      homebrew-executable "fetch" "-v"
+      homebrew-executable
+      "fetch"
       formula
       (homebrew--process-args args))
     'homebrew--async-alert))
@@ -333,7 +349,7 @@ Pop the process buffer on failure."
                  (read-string "Arguments (default --stable) " nil nil "--stable")))
   (set-process-sentinel
     (homebrew--start-process homebrew-executable
-      "install" "-v" "--build-from-source"
+      "install"
       formula
       (homebrew--process-args args))
     'homebrew--async-alert)
@@ -342,8 +358,7 @@ Pop the process buffer on failure."
                             (split-window-sensibly)
                           (next-window))))
     (with-selected-window install-window
-      (switch-to-buffer (concat "*" homebrew-executable " install -v --build-from-source "
-                          formula " " (string-trim-right (mapconcat 'identity args " ")) "*"))
+      (switch-to-buffer (concat "*" homebrew-executable " install " formula"*"))
       (goto-char (point-max)))))
 
 (defun homebrew-brew-test (formula &rest args)
