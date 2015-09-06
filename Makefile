@@ -1,4 +1,4 @@
-.PHONY: compile clean major minor patch test
+.PHONY: default compile clean major minor patch tag test
 
 prefix ?= /usr/local
 lispdir?= $(prefix)/share/emacs/site-lisp/homebrew-mode
