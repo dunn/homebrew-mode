@@ -70,6 +70,9 @@
 
 ;; ## custom variables
 
+;; These are just the most important variables; run `M-x customize-group
+;; RET homebrew-mode` to see the rest.
+
 ;; - If you’re using Linuxbrew or a non-standard prefix on Mac OS, you’ll
 ;;   need to update `homebrew-prefix` to point at your `brew –-prefix`.
 
