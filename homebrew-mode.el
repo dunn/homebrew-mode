@@ -330,7 +330,7 @@ Pop the process buffer on failure."
   (interactive (list (homebrew--formula-from-file buffer-file-name)))
   (message "Auditing %s ..." formula)
   (set-process-sentinel
-    (homebrew--start-process homebrew-executable "audit" "--strict" "--online" formula)
+    (homebrew--start-process homebrew-executable "audit" formula "--strict" "--online")
     'homebrew--async-alert))
 
 (defun homebrew-brew-fetch (formula &rest args)
