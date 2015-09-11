@@ -83,7 +83,9 @@
 ;;   have inline patches, set `homebrew-patch-whitespace-mode` to
 ;;   `t`. It’s off by default since it looks ugly.
 
-;;; Dependencies
+;;; Code:
+
+;; Dependencies
 
 ;; built-in
 (require 'dired)
@@ -95,11 +97,11 @@
 (require 'dash)
 (require 'inf-ruby)
 
-;;; Code:
+;; Version string
 
 (defconst homebrew-mode-version "1.3.1")
 
-;; Customization
+;; Custom variables
 
 (defgroup homebrew-mode nil
   "Minor mode for editing Homebrew formulae."
