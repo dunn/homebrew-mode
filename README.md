@@ -1,4 +1,4 @@
-# hombrew-mode
+# homebrew-mode
 
 [![Melpa Status](http://melpa.org/packages/homebrew-mode-badge.svg)](http://melpa.org/#/homebrew-mode)
 [![Melpa Stable Status](http://stable.melpa.org/packages/homebrew-mode-badge.svg)](http://stable.melpa.org/#/homebrew-mode)

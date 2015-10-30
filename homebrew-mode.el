@@ -24,7 +24,7 @@
 
 ;;; Commentary:
 
-;; # hombrew-mode
+;; # homebrew-mode
 
 ;; Emacs minor mode for editing [Homebrew](http://brew.sh) formulae.
 
