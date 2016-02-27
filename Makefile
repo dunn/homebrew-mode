@@ -1,11 +1,11 @@
-.PHONY: default compile clean major minor patch tag test
+.PHONY: default compile clean major minor patch tag tests
 
 prefix ?= /usr/local
 lispdir?= $(prefix)/share/emacs/site-lisp/homebrew-mode
 
 emacs    ?= $(shell which emacs)
 inf_ruby ?= /usr/local/share/emacs/site-lisp/inf-ruby/
-dash     ?= /usr/local/share/emacs/site-lisp/dash/
+dash     ?= /usr/local/share/emacs/site-lisp/dash-emacs/
 
 BASE_FILE = homebrew-mode.el
 LISPS = $(BASE_FILE)
@@ -19,9 +19,9 @@ install: compile
 	mkdir -p $(lispdir)
 	install -m 644 $(LISPS) *.elc $(lispdir)
 
-test:
+tests:
 	$(emacs) --batch -Q --load ert --directory $(inf_ruby) --directory $(dash) \
-		--load ./homebrew-mode.el --load ./tests/homebrew-ert-tests.el \
+		--load homebrew-mode.el --load tests/homebrew-mode-ert.el \
 		--eval "(ert-run-tests-batch-and-exit '(not (tag interactive)))"
 
 clean:
