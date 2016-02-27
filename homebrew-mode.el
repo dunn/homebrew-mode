@@ -276,7 +276,11 @@ The primary subcommand (e.g., 'install') must be the first
 element of ARGS.
 
 Return the process."
-  (let ((command-string (homebrew--short-command args)))
+  (let ((command-string (homebrew--short-command args))
+        ;; Use pipe instead of tty; significantly increases
+        ;; performance, especially for processes with verbose output.
+        ;; See `magit-process-connection-type' for more information.
+        (process-connection-type nil))
     (apply 'start-process
       ;; Process name:
       command-string
