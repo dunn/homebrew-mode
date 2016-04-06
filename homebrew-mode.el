@@ -209,7 +209,7 @@ Ignore the CHANGE of state argument passed by `set-process-sentinel'."
     (let* ( (exit-code (process-exit-status process))
             (proc-name (process-name process))
             ;; is there no replace-in-string?
-            (unpack-cmd (replace-regexp-in-string "fetch" "unpack" proc-name)))
+            (unpack-cmd (replace-regexp-in-string "brew fetch" "brew unpack" proc-name)))
       (if (= 0 exit-code)
         ;; * Temporarily set default-directory to the Homebrew cache,
         ;;   so we unpack in the right place.
