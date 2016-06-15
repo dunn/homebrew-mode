@@ -4,7 +4,7 @@
 
 ;; Author: Alex Dunn <dunn.alex@gmail.com>
 ;; URL: https://github.com/dunn/homebrew-mode
-;; Version: 1.3.5
+;; Version: 1.3.6
 ;; Package-Requires: ((emacs "24.4") (inf-ruby "2.4.0") (dash "1.2.0"))
 ;; Keywords: homebrew brew ruby
 ;; Prefix: homebrew
@@ -99,7 +99,7 @@
 
 ;; Version string
 
-(defconst homebrew-mode-version "1.3.5")
+(defconst homebrew-mode-version "1.3.6")
 
 ;; Custom variables
 
