@@ -146,7 +146,7 @@
 
 (defvar homebrew-executable (concat homebrew-prefix "/bin/brew"))
 
-(defcustom homebrew-cache-dir "/Library/Caches/Homebrew/"
+(defcustom homebrew-cache-dir "~/Library/Caches/Homebrew/"
   "The cache directory for Homebrew."
   :group 'homebrew-mode
   :type 'string)
