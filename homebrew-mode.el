@@ -336,7 +336,7 @@ Pop the process buffer on failure."
 (defun homebrew-brew-fetch (formula &rest args)
   "Download FORMULA, using ARGS, to the Homebrew cache, and alert when done."
   (interactive (list buffer-file-name
-                 (read-string "Arguments (default --stable) " nil nil "--stable")))
+                 (read-string "Arguments (e.g. --HEAD) " nil nil nil)))
   (message "Downloading %s ..." formula)
   (set-process-sentinel
     (homebrew--start-process "fetch" formula (homebrew--process-args args))
@@ -345,7 +345,7 @@ Pop the process buffer on failure."
 (defun homebrew-brew-install (formula &rest args)
   "Start `brew install FORMULA ARGS` in a separate buffer and open a window to that buffer."
   (interactive (list buffer-file-name
-                 (read-string "Arguments (default --stable) " nil nil "--stable")))
+                 (read-string "Arguments (e.g. --HEAD) " nil nil nil)))
   (set-process-sentinel
     (homebrew--start-process "install" formula (homebrew--process-args args))
     'homebrew--async-alert)
@@ -361,7 +361,7 @@ Pop the process buffer on failure."
 (defun homebrew-brew-test (formula &rest args)
   "Test FORMULA  with ARGS and alert when done."
   (interactive (list buffer-file-name
-                 (read-string "Arguments (default --stable) " nil nil "--stable")))
+                 (read-string "Arguments (e.g. --HEAD) " nil nil nil)))
 
   (message "Testing %s ..." formula)
   (set-process-sentinel
@@ -379,7 +379,7 @@ Pop the process buffer on failure."
 (defun homebrew-brew-unpack (formula &rest args)
   "Download FORMULA with ARGS to the Homebrew cache, then unpack and open in a new window."
   (interactive (list buffer-file-name
-                 (read-string "Arguments (default --stable) " nil nil "--stable")))
+                 (read-string "Arguments (e.g. --HEAD) " nil nil nil)))
 
   (message "Unpacking %s ..." formula)
   (set-process-sentinel
