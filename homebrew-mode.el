@@ -163,8 +163,7 @@ If you edit this variable, make sure the new value passes the formula-detection 
   :risky t)
 
 (defcustom homebrew-default-args
-  '( "--verbose"
-     "--build-from-source" )
+  '( "--verbose" )
   "Arguments passed to every invocation of `brew`."
   :group 'homebrew-mode
   :type 'list
