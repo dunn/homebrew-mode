@@ -338,16 +338,20 @@ Pop the process buffer on failure."
                  (read-string "Arguments (e.g. --HEAD) " nil nil nil)))
   (message "Downloading %s ..." formula)
   (set-process-sentinel
-    (homebrew--start-process "fetch" formula (homebrew--process-args args))
-    'homebrew--async-alert))
+   (homebrew--start-process "fetch"
+                            formula
+                            (homebrew--process-args (cons "--build-from-source" args)))
+   'homebrew--async-alert))
 
 (defun homebrew-brew-install (formula &rest args)
   "Start `brew install FORMULA ARGS` in a separate buffer and open a window to that buffer."
   (interactive (list buffer-file-name
                  (read-string "Arguments (e.g. --HEAD) " nil nil nil)))
   (set-process-sentinel
-    (homebrew--start-process "install" formula (homebrew--process-args args))
-    'homebrew--async-alert)
+   (homebrew--start-process "install"
+                            formula
+                            (homebrew--process-args (cons "--build-from-source" args)))
+   'homebrew--async-alert)
   ;; This is instead of `pop-to-buffer' since we don't want the install buffer activated
   (let ((install-window (if (= 1 (length (window-list)))
                             (split-window-sensibly)
