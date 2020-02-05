@@ -1,6 +1,6 @@
 ;;; homebrew-mode.el --- minor mode for editing Homebrew formulae
 
-;; Copyright (C) 2015, 2016 Alex Dunn
+;; Copyright (C) 2020 Alex Dunn
 
 ;; Author: Alex Dunn <dunn.alex@gmail.com>
 ;; URL: https://github.com/dunn/homebrew-mode
