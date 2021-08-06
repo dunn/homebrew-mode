@@ -249,6 +249,38 @@ Otherwise return nil."
         (if (string-match elem buffer-or-string)
           (setq match t))))))
 
+(defun homebrew--get-taps-dir ()
+  "Return the Taps directory of the local Homebrew installation."
+  (concat (file-name-as-directory homebrew-prefix)
+          "Homebrew/Library/Taps/"))
+
+(defun homebrew--list-taps ()
+  "Return a list of all tap subdirectories under the Taps directory."
+  (save-match-data
+    (let ((root (homebrew--get-taps-dir))
+          (taps '())
+          (case-fold-search nil))
+      (dolist (user (directory-files root nil "^[^.]") taps)
+        (dolist (repo (directory-files (concat root user) nil "^[^.]"))
+          (let ((dot-git (concat root user "/" repo "/" ".git")))
+            (when (file-exists-p dot-git)
+              (let ((tap (concat user "/"
+                                 (if (string-match "^homebrew-\\(.*\\)" repo)
+                                     (match-string 1 repo)
+                                     repo))))
+                (push tap taps)))))))))
+
+(defun homebrew--get-tap-dir (tap)
+  "Return the full directory pathname of a Homebrew TAP, or nil."
+  (let ((taps (homebrew--get-taps-dir))
+        (user (file-name-directory tap))
+        (repo (file-name-nondirectory tap)))
+    (-find #'file-directory-p
+           (list (concat taps (file-name-as-directory
+                               (concat user repo)))
+                 (concat taps (file-name-as-directory
+                               (concat user "homebrew-" repo)))))))
+
 ;; TODO: why
 (defun homebrew--process-args (args)
   "Make ARGS suitable for passing to `start-process'."
@@ -388,6 +420,19 @@ Pop the process buffer on failure."
   (set-process-sentinel
     (homebrew--start-process "fetch" formula (homebrew--process-args args))
     'homebrew--async-unpack-and-jump))
+
+(defun homebrew-tap (tap)
+  "Visit the Formula directory of TAP using Dired."
+  (interactive (list (completing-read "Visit Homebrew tap: "
+                                      (homebrew--list-taps) nil t)))
+  (when (string-blank-p tap)
+    (error "No tap given"))
+  (let ((taproot (or (homebrew--get-tap-dir tap)
+                     (error "Tap not available locally: %s" tap))))
+    (dired (-find #'file-directory-p
+                  (list (concat taproot "Formula")
+                        (concat taproot "Casks")
+                        taproot)))))
 
 (defun homebrew-poet-insert (packages)
   "Insert resource blocks for the specified Python PACKAGES."
