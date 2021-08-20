@@ -421,6 +421,7 @@ Pop the process buffer on failure."
     (homebrew--start-process "fetch" formula (homebrew--process-args args))
     'homebrew--async-unpack-and-jump))
 
+;;;###autoload
 (defun homebrew-tap (tap)
   "Visit the Formula directory of TAP using Dired."
   (interactive (list (completing-read "Visit Homebrew tap: "
