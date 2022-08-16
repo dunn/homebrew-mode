@@ -1,4 +1,4 @@
-;;; homebrew-mode.el --- minor mode for editing Homebrew formulae
+;;; homebrew-mode.el --- Minor mode for editing Homebrew formulae
 
 ;; Copyright (C) 2020 Alex Dunn
 
@@ -6,7 +6,7 @@
 ;; URL: https://github.com/dunn/homebrew-mode
 ;; Version: 2.0.0
 ;; Package-Requires: ((emacs "24.4") (inf-ruby "2.4.0") (dash "1.2.0"))
-;; Keywords: homebrew brew ruby
+;; Keywords: languages homebrew brew ruby
 ;; Prefix: homebrew
 
 ;; This program is free software; you can redistribute it and/or modify
