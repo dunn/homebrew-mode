@@ -103,7 +103,7 @@
 
 ;; Custom variables
 
-(defgroup homebrew-mode nil
+(defgroup homebrew nil
   "Minor mode for editing Homebrew formulae."
   :group 'ruby)
 
@@ -111,7 +111,7 @@
 ;; so ty lunaryorn.
 (defcustom homebrew-mode-keymap-prefix (kbd "C-c C-h")
   "Prefix for homebrew-mode key bindings."
-  :group 'homebrew-mode
+  :group 'homebrew
   :type 'string
   :risky t)
 
@@ -129,7 +129,7 @@
     (define-key map "u"     #'homebrew-brew-unpack)
     map)
   "Keymap for `homebrew-mode` commands prefixed by homebrew-mode-keymap-prefix."
-  :group 'homebrew-mode
+  :group 'homebrew
   :type 'string)
 
 (defvar homebrew-mode-map
@@ -141,14 +141,14 @@
 
 (defcustom homebrew-prefix "/usr/local"
   "The base of your Homebrew installation.  May be different on your system."
-  :group 'homebrew-mode
+  :group 'homebrew
   :type 'string)
 
 (defvar homebrew-executable (concat homebrew-prefix "/bin/brew"))
 
 (defcustom homebrew-cache-dir "~/Library/Caches/Homebrew/"
   "The cache directory for Homebrew."
-  :group 'homebrew-mode
+  :group 'homebrew
   :type 'string)
 
 (defcustom homebrew-formula-file-patterns
@@ -158,25 +158,25 @@
   "Regular expressions matching Homebrew formulae files.
 
 If you edit this variable, make sure the new value passes the formula-detection tests."
-  :group 'homebrew-mode
+  :group 'homebrew
   :type 'list
   :risky t)
 
 (defcustom homebrew-default-args
   '( "--verbose" )
   "Arguments passed to every invocation of `brew`."
-  :group 'homebrew-mode
+  :group 'homebrew
   :type 'list
   :risky t)
 
 (defcustom homebrew-patch-whitespace-mode nil
   "Turn on `whitespace-mode' when editing formulae with inline patches."
-  :group 'homebrew-mode
+  :group 'homebrew
   :type 'boolean)
 
 (defcustom homebrew-poet-executable nil
   "Path to `poet` executable.  Install with `pip install homebrew-pypi-poet`."
-  :group 'homebrew-mode
+  :group 'homebrew
   :type 'string)
 
 (defvar homebrew-tap-history '()
