@@ -179,6 +179,9 @@ If you edit this variable, make sure the new value passes the formula-detection 
   :group 'homebrew-mode
   :type 'string)
 
+(defvar homebrew-tap-history '()
+  "History of visited Homebrew taps.")
+
 ;;; Internal functions
 
 ;; Extracted from async.el
@@ -430,16 +433,22 @@ Pop the process buffer on failure."
 ;;;###autoload
 (defun homebrew-tap (tap)
   "Visit the Formula directory of TAP using Dired."
-  (interactive (list (completing-read "Visit Homebrew tap: "
-                                      (homebrew--list-taps) nil t)))
+  (interactive
+   (list (completing-read "Visit Homebrew tap: "
+                          (homebrew--list-taps)
+                          nil t nil 'homebrew-tap-history)))
   (when (string-blank-p tap)
     (error "No tap given"))
-  (let ((taproot (or (homebrew--get-tap-dir tap)
-                     (error "Tap not available locally: %s" tap))))
-    (dired (-find #'file-directory-p
-                  (list (concat taproot "Formula")
-                        (concat taproot "Casks")
-                        taproot)))))
+  (let* ((taproot (or (homebrew--get-tap-dir tap)
+                      (error "Tap not available locally: %s" tap)))
+         (subdirs (-filter #'file-directory-p
+                           (list (concat taproot "Formula")
+                                 (concat taproot "Casks"))))
+         (n (length subdirs)))
+    (cond ((= n 0) (dired taproot))
+          ((= n 1) (dired (-first-item subdirs)))
+          (t       (dired taproot)
+                   (dired-goto-file (-first-item subdirs))))))
 
 (defun homebrew-poet-insert (packages)
   "Insert resource blocks for the specified Python PACKAGES."
